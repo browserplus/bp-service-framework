@@ -6,7 +6,7 @@
 
 #include "bpservicedescription.h"
 #include "bptransaction.h"
-#include "ServiceAPI/bppfunctions.h"    // from BrowserPlus Service SDK
+#include "bpserviceapi/bppfunctions.h"    // from BrowserPlus Service SDK
 
 
 namespace bplus {
@@ -17,14 +17,30 @@ class Service
 {
 public:
     Service() {}
+
+    // This method is called immediately after the instance has been
+    // fully constructed and initialized.
+    // Derived services can implement this method.
+    // Some base members/methods are not accessible until this is called,
+    // e.g. context().
+    virtual void finalConstruct() {}
+    
     virtual ~Service() {}
     
 public:
+    // Note: values for level are BP_[DEBUG|INFO|WARN|ERROR|FATAL],
+    // declared in bpcfunctions.h.
     static void     log( unsigned int level,
                          const std::string& sLog );
     
     // Get contextual information for this instance.  See bppfunctions.h.
+    // Note: do not access this prior to invokation of finalConstruct().
     const std::map<std::string,std::string>& context();
+
+    // Get a particular value from the context map.
+    // Returns empty string key not found.
+    // Note: do not access this prior to invokation of finalConstruct().
+    std::string     context( const std::string& key );
     
 private:    
     static const BPCoreletDefinition*
@@ -87,6 +103,14 @@ Service::context()
 }
 
    
+inline std::string
+Service::context( const std::string& key )
+{
+    std::map<std::string, std::string>::iterator it = m_mapContext.find( key );
+    return it == m_mapContext.end() ? "" : it->second;
+}
+
+
 inline void
 Service::log( unsigned int level,
               const std::string& sLog )
@@ -140,7 +164,8 @@ Service::bppAllocate( void** instance,
 {
     Service* pInst = createInstance();
     pInst->setContext( pContext );
-
+    pInst->finalConstruct();
+    
     *instance = (void*) pInst;
 
     return 0;
@@ -232,7 +257,7 @@ bplus::service::Service* bplus::service::Service::createInstance() \
     return new className(); \
 } \
 \
-typedef void (className::* tInvokableFunc)( const Transaction& tran, \
+typedef void (className::* tInvokableFunc)( const bplus::service::Transaction& tran, \
                                             const bplus::Map& args );\
 std::map<std::string, tInvokableFunc> className::s_mapFuncs;
 
@@ -240,7 +265,7 @@ std::map<std::string, tInvokableFunc> className::s_mapFuncs;
 
 #define BP_SERVICE_DESC( className, serviceName, version, docString ) \
 BP_SERVICE_DEFNS( className ); \
-const BPCoreletDefinition* Service::getDescription() \
+const BPCoreletDefinition* bplus::service::Service::getDescription() \
 { \
     s_description.clear(); \
     s_description.setName( serviceName ); \
@@ -276,12 +301,12 @@ const BPCoreletDefinition* Service::getDescription() \
 
 
 #define BP_SERVICE( className ) \
-typedef void (className::* tInvokableFunc)( const Transaction& tran, \
+typedef void (className::* tInvokableFunc)( const bplus::service::Transaction& tran, \
                                             const bplus::Map& args ); \
 static std::map<std::string, tInvokableFunc> s_mapFuncs; \
 \
 void invoke( const char* cszFuncName, \
-             const Transaction& tran, \
+             const bplus::service::Transaction& tran, \
              const bplus::Map& args ) \
 { \
     std::map<std::string, tInvokableFunc>::iterator it; \

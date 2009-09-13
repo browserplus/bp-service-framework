@@ -4,8 +4,8 @@
 #ifndef BPTRANSACTION_H_
 #define BPTRANSACTION_H_
 
-#include "bptypeutil.h"
-#include "ServiceAPI/bpcfunctions.h"    // from BrowserPlus Service SDK
+#include "bputil/bptypeutil.h"
+#include "bpserviceapi/bpcfunctions.h"    // from BrowserPlus Service SDK
 
 
 namespace bplus {

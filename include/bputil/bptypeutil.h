@@ -32,7 +32,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "ServiceAPI/bptypes.h"     // from BrowserPlus Service SDK
+#include "bpserviceapi/bptypes.h"     // from BrowserPlus Service SDK
 
 
 
@@ -325,7 +325,7 @@ namespace bplus {
 
 //////////////////////////////////////////////////////////////////////
 // Get the implementations.
-#include "bptypeutilimpl.h"
+#include "impl/bptypeutilimpl.h"
 
 
 #endif // BPTYPEUTIL_H_

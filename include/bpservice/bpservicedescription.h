@@ -34,8 +34,8 @@
 
 #include <list>
 #include "bpserviceversion.h"
-#include "bptypeutil.h"
-#include "ServiceAPI/bpdefinition.h"    // from BrowserPlus Service SDK
+#include "bputil/bptypeutil.h"
+#include "bpserviceapi/bpdefinition.h"    // from BrowserPlus Service SDK
 
 
 
@@ -277,7 +277,7 @@ validateArguments(const bplus::service::Function & desc, bplus::Map* arguments);
 
 //////////////////////////////////////////////////////////////////////
 // Get the implementations.
-#include "bpservicedescriptionimpl.h"
+#include "impl/bpservicedescriptionimpl.h"
 
 
 #endif // BPSERVICEDESCRIPTION_H_

@@ -31,8 +31,8 @@
 #ifndef __BPDEFINITION_H__
 #define __BPDEFINITION_H__
 
-#include <ServiceAPI/bptypes.h>
-#include <ServiceAPI/bperror.h>
+#include "bpserviceapi/bptypes.h"
+#include "bpserviceapi/bperror.h"
 
 #ifdef __cplusplus
 extern "C" {

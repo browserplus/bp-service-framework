@@ -28,8 +28,8 @@
 #ifndef __BPCFUNCTIONS_H__
 #define __BPCFUNCTIONS_H__
 
-#include <ServiceAPI/bptypes.h>
-#include <ServiceAPI/bpdefinition.h>
+#include "bpserviceapi/bptypes.h"
+#include "bpserviceapi/bpdefinition.h"
 
 #ifdef __cplusplus
 extern "C" {

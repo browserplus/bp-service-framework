@@ -31,9 +31,9 @@
 #ifndef __BPPFUNCTIONS_H__
 #define __BPPFUNCTIONS_H__
 
-#include <ServiceAPI/bptypes.h>
-#include <ServiceAPI/bpdefinition.h>
-#include <ServiceAPI/bpcfunctions.h>
+#include "bpserviceapi/bptypes.h"
+#include "bpserviceapi/bpdefinition.h"
+#include "bpserviceapi/bpcfunctions.h"
 
 #ifdef __cplusplus
 extern "C" {
