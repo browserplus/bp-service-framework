@@ -22,13 +22,12 @@
 /*
  *  bpstrutil.cpp
  *
+ *  Inline implementation file for bpstrutil.h
+ *
  *  Created by Gordon Durand on 7/20/07.
  *  Copyright 2007 Yahoo! Inc. All rights reserved.
  *
  */
-
-//#include "bpstrutil.h"
-
 #include <algorithm>
 #include <assert.h>
 #include <ios>
@@ -313,6 +312,8 @@ trimRight( const std::string& sIn )
 }
 
 
+// Disabled for the moment: requires boost on gcc.
+/*
 inline bool
 matchesWildcard(const std::string& s,
                 const std::string& pattern)
@@ -343,6 +344,7 @@ matchesWildcard(const std::string& s,
     }
     return rval;
 }
+*/
 
 
 inline std::string 

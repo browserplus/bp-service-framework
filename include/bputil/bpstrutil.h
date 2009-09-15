@@ -123,8 +123,10 @@ bool isEqualNoCase( const std::string& s1,
  * return whether a string completely matches a wildcard
  * pattern containing '*' as the wildcard character
  */
-bool matchesWildcard(const std::string& s,
-                     const std::string& pattern);
+// Disabled for the moment: requires boost on gcc.
+//bool matchesWildcard(const std::string& s,
+//                     const std::string& pattern);
+
 /**
  * return a string corresponding to cszIn.
  * if cszIn is 0, return an empty string.
