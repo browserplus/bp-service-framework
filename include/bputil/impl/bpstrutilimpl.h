@@ -35,7 +35,7 @@
 #include <iterator>
 #include <fstream>
 #include <functional>
-#include <regex>
+//#include <regex>
 
 /*
 #ifdef WIN32
