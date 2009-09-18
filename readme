@@ -1,1 +1,29 @@
-blah
+This project provides a header-only framework for easy authoring of BrowserPlus
+services in C++.
+
+A very simple demonstration service using this framework may be found at:
+http://github.com/dgrigsby/bp-helloworld.
+
+A more complex service based on this framework may be found at:
+http://github.com/browserplus/bp-pubsub.
+
+
+To use this framework:
+
+1) Either download the files or setup bp-service-framework as a git
+submodule of your project.  The projects listed above demonstrate the git
+submodule approach.
+
+2) Create a class for your service and derive it from
+bplus::service::Service.
+
+3) Add an invokation of: BP_SERVICE( YourClasName ) in your class declaration.
+
+4) Use BP_SERVICE_DESC, ADD_BP_METHOD, ADD_BP_METHOD_ARG, and
+END_BP_SERVICE_DESC macro to setup the C API of your service.
+
+5) Use Service::context() and Service::log() as needed.
+
+6) Use bplus::service::Transaction and bplus::service::Callback as needed.
+
+7) Use utility classes and functions from the bputil directory as needed.
