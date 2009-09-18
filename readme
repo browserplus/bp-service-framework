@@ -1,3 +1,5 @@
+BrowserPlus Service Framework
+
 This project provides a header-only framework for easy authoring of BrowserPlus
 services in C++.
 
@@ -17,7 +19,7 @@ submodule approach.
 2) Create a class for your service and derive it from
 bplus::service::Service.
 
-3) Add an invokation of: BP_SERVICE( YourClasName ) in your class declaration.
+3) Add an invokation of: BP_SERVICE( YourClassName ) in your class declaration.
 
 4) Use BP_SERVICE_DESC, ADD_BP_METHOD, ADD_BP_METHOD_ARG, and
 END_BP_SERVICE_DESC macro to setup the C API of your service.
@@ -27,3 +29,8 @@ END_BP_SERVICE_DESC macro to setup the C API of your service.
 6) Use bplus::service::Transaction and bplus::service::Callback as needed.
 
 7) Use utility classes and functions from the bputil directory as needed.
+
+8) If you use CMake to build your service, you may find it convenient for
+your CMakeLists.txt to include build_support/BuildConfigs.cmake to setup
+some default compiler/linker settings.
+
