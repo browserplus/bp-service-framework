@@ -40,14 +40,11 @@ namespace service {
 class Callback
 {
 public:    
-    /**
-     * \param tran The transaction
-     * \param cb The callback method to call.
-     *           Note: we accept type Object& for caller convenience, but
-     *           this arg must be of type bplus::CallBack& at runtime.
-     */
+
+    // ctor
     Callback( const Transaction& tran, const bplus::CallBack& cb );
 
+    // Invoke the callback, passing it provided arg object.
     void invoke( const bplus::Object& args ) const;
 
 private:

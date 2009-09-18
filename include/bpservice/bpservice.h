@@ -42,30 +42,32 @@ namespace service {
 class Service
 {
 public:
+    // ctor
     Service() {}
 
+    // Additional initialization.
     // This method is called immediately after the instance has been
     // fully constructed and initialized.
-    // Derived services can implement this method.
-    // Some base members/methods are not accessible until this is called,
-    // e.g. context().
+    // Derived services can override this method.
     virtual void finalConstruct() {}
-    
+
+    // dtor
     virtual ~Service() {}
     
 public:
+    // Log to the bplus logging system.
     // Note: values for level are BP_[DEBUG|INFO|WARN|ERROR|FATAL],
     // declared in bpcfunctions.h.
     static void     log( unsigned int level,
                          const std::string& sLog );
     
     // Get contextual information for this instance.  See bppfunctions.h.
-    // Note: do not access this prior to invokation of finalConstruct().
+    // Note: do not call this method prior to invokation of finalConstruct().
     const std::map<std::string,std::string>& context();
 
     // Get a particular value from the context map.
     // Returns empty string key not found.
-    // Note: do not access this prior to invokation of finalConstruct().
+    // Note: do not call this method prior to invokation of finalConstruct().
     std::string     context( const std::string& key );
     
 private:    

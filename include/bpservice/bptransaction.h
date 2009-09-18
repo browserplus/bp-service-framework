@@ -38,27 +38,35 @@ namespace bplus {
 namespace service {
 
 
+//////////////////////////////////////////////////////////////////////
+// Transaction
+//
+// Represents an active service transaction.
+//
 class Transaction
 {
 public:    
+    // ctor
     Transaction( const BPCFunctionTable* pCoreFuncs, unsigned int tid );
 
 public:
+    // End the transaction, indicating success, with the specified result.
     void            complete( const bplus::Object& result ) const;
-    
+
+    // End the transaction, indicating failure.
+    // Terse and verbose error descriptions may be provided.
     void            error( const char* szError = 0,
                            const char* szVerboseError = 0 ) const;
 
-    /**
-     * Invoke a callback back into the service's client.
-     * \param cb The callback to call.
-     *           Note: we accept type Object& for caller convenience, but
-     *           this arg must be of type CallBack& at runtime.
-     * \param args The arguments to the callback.
-     */
+    // Invoke a callback back into the service's client.
+    // cb:   The callback to call.
+    //       Note: we accept type Object& for caller convenience, but
+    //       this arg must be of type CallBack& at runtime.
+    // args: The arguments to the callback.
     void            invokeCallback( const bplus::Object& cb,
                                     const bplus::Object& args ) const;
-    
+
+    // Prompt the user.
     unsigned int    promptUser( const std::string& sUtf8PathToHTMLDialog,
                                 const bplus::Object& args,
                                 BPUserResponseCallbackFuncPtr responseCallback,
