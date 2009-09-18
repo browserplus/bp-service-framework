@@ -20,14 +20,20 @@
  * ***** END LICENSE BLOCK *****
  */
 /*
- *  bpstrutil.cpp
+ *  bpstrutilimpl.h
  *
  *  Inline implementation file for bpstrutil.h
  *
+ *  Note: This file is included by bpstrutil.h.
+ *        It is not intended for direct inclusion by client code.
+ *       
  *  Created by Gordon Durand on 7/20/07.
  *  Copyright 2007 Yahoo! Inc. All rights reserved.
  *
  */
+#ifndef BPSTRUTILIMPL_H_
+#define BPSTRUTILIMPL_H_
+
 #include <algorithm>
 #include <assert.h>
 #include <ios>
@@ -436,3 +442,6 @@ storeToFile(const std::string& sPath, const std::string& sIn)
 
 } // namespace string
 } // namespace bp
+
+
+#endif // BPSTRUTILIMPL_H_

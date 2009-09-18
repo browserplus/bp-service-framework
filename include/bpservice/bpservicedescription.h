@@ -21,6 +21,8 @@
  */
 
 /**
+ * bpservicedescription.h
+ * 
  * An abstraction around the in-memory representation of a description
  * of a service's interface.
  *
@@ -35,11 +37,12 @@
 #include <list>
 #include "bpserviceversion.h"
 #include "bputil/bptypeutil.h"
-#include "bpserviceapi/bpdefinition.h"    // from BrowserPlus Service SDK
+#include "bpserviceapi/bpdefinition.h"
 
 
+namespace bplus {
+namespace service {
 
-namespace bplus { namespace service {
 
 /**
  * an in memory representation of an argument to a function on a corelet
@@ -271,8 +274,10 @@ std::string validateArguments(const bplus::service::Function & fdesc,
 
 std::string
 validateArguments(const bplus::service::Function & desc, bplus::Map* arguments);
- 
-} }
+
+
+} // namespace service
+} // namespace bplus
 
 
 //////////////////////////////////////////////////////////////////////

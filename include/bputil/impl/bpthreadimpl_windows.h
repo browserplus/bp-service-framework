@@ -20,21 +20,24 @@
  * ***** END LICENSE BLOCK *****
  */
 /**
- *  bpthread.h -- POSIX like abstractions around OS threads.
+ *  bpthreadimpl_windows.h
+ * 
+ *  Inline implementation file for bpthread.h (windows version).
  *
+ *  Note: This file is included by bpthread.h.
+ *        It is not intended for direct inclusion by client code.
+ *       
  *  Written by Lloyd Hilaiel, 2005 & 2007
  */
-
 #include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <signal.h>
 #include <assert.h>
 
-//#include "bpthread.hh"
 
-//using namespace bp::thread;
-namespace bplus { namespace thread {
+namespace bplus {
+namespace thread {
 
 
 struct WinThreadData {
@@ -96,4 +99,8 @@ Thread::currentThreadID()
 }
 
 
-}}
+} // namespace thread
+} // namespace bplus
+
+#endif // BPTHREADIMPLWINDOWS_H_
+

@@ -20,12 +20,17 @@
  * ***** END LICENSE BLOCK *****
  */
 /**
- *  bpthread.h -- POSIX like abstractions around OS threads.
+ *  bpthreadimpl_darwin.h
+ * 
+ *  Inline implementation file for bpthread.h (darwin version).
  *
+ *  Note: This file is included by bpthread.h.
+ *        It is not intended for direct inclusion by client code.
+ *       
  *  Written by Lloyd Hilaiel, 2005 & 2007
  */
-
-//#include "bpthread.h"
+#ifndef BPTHREADIMPLDARWIN_H
+#define BPTHREADIMPLDARWIN_H
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -33,8 +38,10 @@
 #include <pthread.h>
 #include <assert.h>
 
-//using namespace bp::thread;
-namespace bplus { namespace thread {
+
+namespace bplus {
+namespace thread {
+
 
 inline static void blockSignal(int cig)
 {
@@ -117,4 +124,9 @@ Thread::currentThreadID()
 }
 
 
-}}
+} // namespace thread
+} // namespace bplus
+
+
+#endif // BPTHREADIMPLDARWIN_H_
+

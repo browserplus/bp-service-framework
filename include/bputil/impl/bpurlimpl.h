@@ -19,8 +19,13 @@
  * Contributor(s): 
  * ***** END LICENSE BLOCK *****
  */
-/*
- *  bpurl.cpp
+/**
+ *  bpurlimpl.h
+ * 
+ *  Inline implementation file for bpurl.h.
+ *
+ *  Note: This file is included by bpurl.h.
+ *        It is not intended for direct inclusion by client code.
  *
  *  Implements the Url class and related items.
  *
@@ -28,11 +33,12 @@
  *  Portions based on code by Lloyd Hilaiel
  *  
  *  Copyright 2008 Yahoo! Inc. All rights reserved.
- *
  */
+#ifndef BPURLIMPL_H_
+#define BPURLIMPL_H_
 
-//#include "bpurl.h"
 #include <sstream>
+
 
 namespace bplus {
 namespace url {
@@ -394,3 +400,5 @@ inline void Url::setFrag( const std::string& sFrag )
 } // namespace url
 } // namespace bp
 
+
+#endif // BPUTLIMPL_H_

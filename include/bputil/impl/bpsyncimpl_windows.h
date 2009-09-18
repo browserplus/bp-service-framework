@@ -19,10 +19,24 @@
  * Contributor(s): 
  * ***** END LICENSE BLOCK *****
  */
-//#include "bpsync.h"
-#include <windows.h>
+/*
+ *  bpsyncimpl_windows.h
+ *
+ *  Inline implementation file for bpsync.h (windows version)
+ *
+ *  Note: This file is included by bpstrutil.h.
+ *        It is not intended for direct inclusion by client code.
+ *       
+ *  Created by Gordon Durand on 7/20/07.
+ *  Copyright 2007 Yahoo! Inc. All rights reserved.
+ *
+ */
+#ifndef BPSYNCIMPLWINDOWS_H_
+#define BPSYNCIMPLWINDOWS_H_
 
+#include <windows.h>
 #include <stdlib.h>
+
 
 inline bplus::sync::Mutex::Mutex()
 {
@@ -133,3 +147,5 @@ bplus::sync::Condition::timeWait(bplus::sync::Mutex * m, unsigned int msecs)
     return false;
 }
 
+
+#endif // BPSYNCIMPLWINDOWS_H_

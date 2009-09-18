@@ -19,7 +19,20 @@
  * Contributor(s): 
  * ***** END LICENSE BLOCK *****
  */
-//#include "bpsync.h"
+/*
+ *  bpsyncimpl_unix.h
+ *
+ *  Inline implementation file for bpsync.h (unix version)
+ *
+ *  Note: This file is included by bpsync.h.
+ *        It is not intended for direct inclusion by client code.
+ *       
+ *  Created by Gordon Durand on 7/20/07.
+ *  Copyright 2007 Yahoo! Inc. All rights reserved.
+ *
+ */
+#ifndef BPSYNCIMPLUNIX_H
+#define BPSYNCIMPLUNIX_H
 
 #include <pthread.h>
 #include <sys/time.h>
@@ -113,3 +126,7 @@ bplus::sync::Condition::timeWait(Mutex * m, unsigned int msec)
     // error, we assume timeout. 
     return (ret == 0);
 }
+
+
+#endif // BPSYNCIMPLUNIX_H
+

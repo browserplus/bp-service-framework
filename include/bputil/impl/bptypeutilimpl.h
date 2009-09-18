@@ -20,12 +20,12 @@
  * ***** END LICENSE BLOCK ***** */
 
 /**
- * bputil.hh -- c++ utilities to make building hierarchies of BPElements
- *              eaiser.  A tool that may be consumed in source form
- *              by a corelet author to simplify mapping into and out of
- *              introspectable corelet API types.
+ *  bptypeutilimpl.h
+ * 
+ *  Inline implementation file for bptypeutil.h.
  *
- * Inline implementation file - meant to be included by bptyputil.h.             
+ *  Note: This file is included by bptypeutil.h.
+ *        It is not intended for direct inclusion by client code.
  */
 #ifndef BPTYPEUTILIMPL_H_
 #define BPTYPEUTILIMPL_H_

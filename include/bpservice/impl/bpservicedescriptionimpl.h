@@ -19,10 +19,13 @@
  * Contributor(s): 
  * ***** END LICENSE BLOCK *****
  */
+
 /**
- * Description
- *
- * Inline implementation file for bpsericedescription.h.
+ *  Inline implementation file for bpservicedescription.h.
+ * 
+ *  Note: This file is included by bpservicedescription.h.
+ *        It is not intended for direct inclusion by client code.
+ *       
  */
 #ifndef BPSERVICEDESRIPTIONIMPL_H_
 #define BPSERVICEDESRIPTIONIMPL_H_
