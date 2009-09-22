@@ -20,20 +20,14 @@
  * ***** END LICENSE BLOCK *****
  */
 /*
- *  bpstrutilimpl.h
+ *  bpstrutil.h
  *
  *  Inline implementation file for bpstrutil.h
  *
- *  Note: This file is included by bpstrutil.h.
- *        It is not intended for direct inclusion by client code.
- *       
  *  Created by Gordon Durand on 7/20/07.
  *  Copyright 2007 Yahoo! Inc. All rights reserved.
  *
  */
-#ifndef BPSTRUTILIMPL_H_
-#define BPSTRUTILIMPL_H_
-
 #include <algorithm>
 #include <assert.h>
 #include <ios>
@@ -62,10 +56,10 @@ namespace bplus {
 namespace strutil {
 
 
-// Comment these out for the moment due to coupling with
-// exceptions and logging.
+// Note: In bp trunk this throws exceptions on error.
+//       For now in service framework, change to return empty string on
+//       error.
 
-/*
 inline std::wstring
 utf8ToWide(const std::string& sIn)
 {
@@ -81,9 +75,12 @@ utf8ToWide(const std::string& sIn)
                                    -1, pawBuf, nChars);
     if (nRtn==0) {
         delete[] pawBuf;
+/*        
         std::string sErr = "MultiByteToWideChar returned: " +
                            bp::error::lastErrorString();
         BP_THROW( sErr );
+*/
+        return L"";
     } else {
         rval = pawBuf;
         delete[] pawBuf;
@@ -117,6 +114,11 @@ utf8ToWide(const std::string& sIn)
 }
 
 
+
+// Note: In bp trunk this throws exceptions on error.
+//       For now in service framework, change to return empty string on
+//       error.
+
 inline std::string
 wideToUtf8(const std::wstring& wsIn)
 {
@@ -134,9 +136,12 @@ wideToUtf8(const std::wstring& wsIn)
 
     if (nRtn==0) {
         delete[] paBuf;
+/*        
         std::string sErr = "WideCharToMultiByte returned: " +
                            bp::error::lastErrorString();
         BP_THROW( sErr );
+*/
+        return "";
     } else {
         rval = paBuf;
         delete[] paBuf;
@@ -171,7 +176,6 @@ wideToUtf8(const std::wstring& wsIn)
     return rval;
 }
 
-*/
 
 
 inline void
@@ -442,6 +446,3 @@ storeToFile(const std::string& sPath, const std::string& sIn)
 
 } // namespace string
 } // namespace bp
-
-
-#endif // BPSTRUTILIMPL_H_

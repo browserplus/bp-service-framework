@@ -26,11 +26,13 @@
  *  Written by Lloyd Hilaiel, 2005 & 2007
  */
 
-#ifndef __BPTHREAD_H__
-#define __BPTHREAD_H__
+#ifndef BPTHREAD_H_
+#define BPTHREAD_H_
 
-namespace bplus { namespace thread {
-        
+namespace bplus {
+namespace thread {
+
+
 /** A pointer to the routine that the spawned thread will begin
  *  executing */
 typedef void *(*StartRoutine) (void * cookie);
@@ -60,13 +62,17 @@ class Thread
 };
 
 
+} // namespace thread
+} // namespace bplus
+
+
 // #include the inline implementations
 #ifdef WIN32
-#include impl/bpthreadimpl_windows.h
+#include "impl/bpthreadimpl_windows.h"
 #else
-#include impl/bpthreadimpl_darwin.h
+#include "impl/bpthreadimpl_darwin.h"
 #endif
 
-}}
 
-#endif
+#endif // BPTHREAD_H_
+

@@ -43,20 +43,16 @@ namespace strutil {
 /**
  * Converts from UTF-8 to unicode.
  *
- * \returns true iff successful. 
+ * \returns converted string if successful, empty string otherwise. 
  */ 
-// Disable for the moment due to coupling with
-// exceptions and logging.
-//std::wstring utf8ToWide(const std::string& sIn);
+std::wstring utf8ToWide(const std::string& sIn);
 
 /**
  * Converts from unicode to UTF-8.
  *
- * \returns true iff successful. 
+ * \returns converted string if successful, empty string otherwise. 
  */ 
-// Disable for the moment due to coupling with
-// exceptions and logging.
-//std::string wideToUtf8(const std::wstring& wsIn);
+std::string wideToUtf8(const std::wstring& wsIn);
 
 /**
  * return a copy of sIn with all sOld replaced by sNew.
