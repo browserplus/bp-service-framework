@@ -32,8 +32,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "bpserviceapi/bptypes.h"     // from BrowserPlus Service SDK
-
+#include "bpserviceapi/bptypes.h"
 
 
 namespace bplus {
