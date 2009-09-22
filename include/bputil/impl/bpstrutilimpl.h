@@ -23,6 +23,9 @@
  *  bpstrutil.h
  *
  *  Inline implementation file for bpstrutil.h
+ * 
+ *  Note: This file is included by bpstrutil.h.
+ *        It is not intended for direct inclusion by client code.
  *
  *  Created by Gordon Durand on 7/20/07.
  *  Copyright 2007 Yahoo! Inc. All rights reserved.

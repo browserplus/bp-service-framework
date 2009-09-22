@@ -29,8 +29,8 @@
  *       
  *  Written by Lloyd Hilaiel, 2005 & 2007
  */
-#ifndef BPTHREADIMPLDARWIN_H
-#define BPTHREADIMPLDARWIN_H
+#ifndef BPTHREADIMPLDARWIN_H_
+#define BPTHREADIMPLDARWIN_H_
 
 #include <stdlib.h>
 #include <stdio.h>

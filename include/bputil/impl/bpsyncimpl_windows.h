@@ -24,7 +24,7 @@
  *
  *  Inline implementation file for bpsync.h (windows version)
  *
- *  Note: This file is included by bpstrutil.h.
+ *  Note: This file is included by bpsync.h.
  *        It is not intended for direct inclusion by client code.
  *       
  *  Created by Gordon Durand on 7/20/07.

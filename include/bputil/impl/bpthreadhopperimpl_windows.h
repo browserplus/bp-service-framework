@@ -19,11 +19,17 @@
  * Contributor(s): 
  * ***** END LICENSE BLOCK *****
  */
+
+/**
+ *  Inline implementation file for bpthreadhopper.h (windows-specific).
+ * 
+ *  Note: This file is included by bpthreadhopper.h.
+ *        It is not intended for direct inclusion by client code.
+ */
+
 #ifndef BPTHREADHOPPERIMPLWINDOWS_H_
 #define BPTHREADHOPPERIMPLWINDOWS_H_
 
-
-//#include "bpthreadhopper.h"
 #include <windows.h>
 #include "bpsync.h"
 #include "bpuuid.h"

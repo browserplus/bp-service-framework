@@ -19,13 +19,18 @@
  * Contributor(s): 
  * ***** END LICENSE BLOCK *****
  */
-/*
- *  bpuuid_Darwin.cpp
+
+/**
+ *  bpuuidimpl_unix.h
+ * 
+ *  Inline implementation file for bpuuid.h (unix version).
  *
+ *  Note: This file is included by bpuuid.h.
+ *        It is not intended for direct inclusion by client code.
+ *       
  *  Created by David Grigsby on 4/29/08.
  *  
  *  Copyright 2008 Yahoo! Inc. All rights reserved.
- *
  */
 
 #ifndef BPUUIDIMPLUNIX_H_

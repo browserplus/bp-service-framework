@@ -19,6 +19,17 @@
  * Contributor(s): 
  * ***** END LICENSE BLOCK *****
  */
+
+/**
+ *  Inline implementation file for bpthreadhopper.h (darwin-specific).
+ * 
+ *  Note: This file is included by bpthreadhopper.h.
+ *        It is not intended for direct inclusion by client code.
+ */
+
+#ifndef BPTHREADHOPPERIMPLDARWIN_H_
+#define BPTHREADHOPPERIMPLDARWIN_H
+
 #include <iostream>
 #include "../bpsync.h"
 #include "Carbon/Carbon.h"
@@ -131,3 +142,5 @@ bplus::thread::Hopper::processOutstandingRequests()
 
     mthd->mtx.unlock();
 }
+
+#endif // BPTHREADHOPPERIMPL_DARWIN_H

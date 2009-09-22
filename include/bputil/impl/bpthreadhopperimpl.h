@@ -19,11 +19,13 @@
  * Contributor(s): 
  * ***** END LICENSE BLOCK *****
  */
-/************************************************************************
- * ThreadHopper - A utility to grab the attention of the thread that
- *        it's instantiated on.  In order to function the thread must
- *        be using operating system provided runloops/event pumps.
- *
+
+/**
+ *  Inline implementation file for bpthreadhopper.h.
+ * 
+ *  Note: This file is included by bpthreadhopper.h.
+ *        It is not intended for direct inclusion by client code.
+ *       
  * Written by Lloyd Hilaiel, Fri Jul  6 13:58:30 MDT 2007
  * (c) 2007, Yahoo! Inc, all rights reserved.
  */
