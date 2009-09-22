@@ -44,6 +44,12 @@ public:
     // ctor
     Callback( const Transaction& tran, const bplus::CallBack& cb );
 
+    // This ctor provided for caller convenience (e.g. when pulling
+    // args from a bplus::Map).
+    // Note the dynamic type of the provided argument must still be a
+    // bplus::CallBack, else a std::bad_cast will be thrown.
+    Callback( const Transaction& tran, const bplus::Object& cb );
+    
     // Invoke the callback, passing it provided arg object.
     void invoke( const bplus::Object& args ) const;
 
@@ -57,6 +63,14 @@ inline
 Callback::Callback( const Transaction& tran, const bplus::CallBack& cb ) :
     m_tran( tran ),
     m_cb( cb )
+{
+}
+
+
+inline
+Callback::Callback( const Transaction& tran, const bplus::Object& cb ) :
+    m_tran( tran ),
+    m_cb( dynamic_cast<const bplus::Map&>( cb ) )
 {
 }
 
