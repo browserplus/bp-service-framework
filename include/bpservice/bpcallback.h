@@ -70,7 +70,7 @@ Callback::Callback( const Transaction& tran, const bplus::CallBack& cb ) :
 inline
 Callback::Callback( const Transaction& tran, const bplus::Object& cb ) :
     m_tran( tran ),
-    m_cb( dynamic_cast<const bplus::Map&>( cb ) )
+    m_cb( dynamic_cast<const bplus::CallBack&>( cb ) )
 {
 }
 
