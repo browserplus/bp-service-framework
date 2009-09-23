@@ -40,14 +40,12 @@
 #include <functional>
 //#include <regex>
 
-/*
 #ifdef WIN32
 #include "windows.h"
 #endif
 #ifdef MACOSX
 #include <Carbon/Carbon.h>
 #endif
-*/
 
 //#include "boost/algorithm/string/split.hpp"
 
