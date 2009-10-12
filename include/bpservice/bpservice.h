@@ -47,8 +47,8 @@ public:
 
     // Additional initialization.
     // This method is called immediately after the instance has been
-    // fully constructed and initialized.
-    // Derived services can override this method.
+    // default constructed and initialized.
+    // Derived services may override this method if desired.
     virtual void finalConstruct() {}
 
     // dtor
@@ -60,14 +60,31 @@ public:
     // declared in bpcfunctions.h.
     static void     log( unsigned int level,
                          const std::string& sLog );
+
+    // Called when the service's dynamic library is being loaded, prior
+    // to allocation of any instances.
+    // Return: bool success code.
+    // Derived services may override this method if desired.
+    static bool     onServiceLoad();
     
+    // Called when the service's dynamic library is about to be unloaded,
+    // after destruction of all instances.
+    // Return: bool success code.
+    // Derived services may override this method if desired.
+    static bool     onServiceUnload();
+    
+    // Returns service name in the form: "name version".
+    static std::string fullName();
+            
     // Get contextual information for this instance.  See bppfunctions.h.
-    // Note: do not call this method prior to invokation of finalConstruct().
+    // Note: Do not call this from derived service's constructor.
+    //       May be used from finalConstruct or any other service method.
     const std::map<std::string,std::string>& context();
 
     // Get a particular value from the context map.
-    // Returns empty string key not found.
-    // Note: do not call this method prior to invokation of finalConstruct().
+    // Returns empty string if key not found.
+    // Note: Do not call this from derived service's constructor.
+    //       May be used from finalConstruct or any other service method.
     std::string     context( const std::string& key );
     
 private:    
@@ -88,8 +105,8 @@ private:
                                unsigned int tid,
                                const BPElement* pArgs );
 
-    static const BPCoreletDefinition* getDescription();
-
+    static void     setupDescription();
+    
     static Service* createInstance();
 
     void            setContext( const BPElement* pContext );
@@ -119,233 +136,13 @@ private:
 };
 
 
-
-////////////////////////////////////////////////////////////////////////////////
-// Service Implementation
-//
-
-inline const std::map<std::string,std::string>&
-Service::context()
-{
-    return m_mapContext;
-}
-
-   
-inline std::string
-Service::context( const std::string& key )
-{
-    std::map<std::string, std::string>::iterator it = m_mapContext.find( key );
-    return it == m_mapContext.end() ? "" : it->second;
-}
-
-
-inline void
-Service::log( unsigned int level,
-              const std::string& sLog )
-{
-    if (s_pCoreFuncs->log) {
-        s_pCoreFuncs->log( level, "%s", sLog.c_str() );
-    }
-}
-
-
-inline const BPPFunctionTable*
-Service::getEntryPoints()
-{
-    static BPPFunctionTable s_functionTable =
-    {
-        BPP_CORELET_API_VERSION,
-        bppInitialize,
-        bppShutdown,
-        bppAllocate,
-        bppDestroy,
-        bppInvoke,
-        0, 0
-    };
-
-    return &s_functionTable;
-}
-
-
-inline const BPCoreletDefinition*
-Service::bppInitialize( const BPCFunctionTable* pCoreFuncs,
-                        const BPElement* pParamMap )
-{
-    s_pCoreFuncs = pCoreFuncs;
-    s_pParamMap = pParamMap;
-
-    return getDescription();
-}
-
-
-inline void
-Service::bppShutdown()
-{
-
-}
-
-
-inline int
-Service::bppAllocate( void** instance,
-                      unsigned int attachID,
-                      const BPElement* pContext )
-{
-    Service* pInst = createInstance();
-    pInst->setContext( pContext );
-    pInst->finalConstruct();
-    
-    *instance = (void*) pInst;
-
-    return 0;
-}
-
-
-inline void
-Service::bppDestroy( void* pInstance )
-{
-    delete (Service*) pInstance;
-}
-
-
-inline void
-Service::bppInvoke( void* pvInst,
-                    const char* cszFuncName,
-                    unsigned int tid,
-                    const BPElement* pArgs )
-{
-    try
-    {
-        Transaction tran( s_pCoreFuncs, tid );
-
-        std::auto_ptr<bplus::Object> poArgs( bplus::Object::build( pArgs ) );
-        bplus::Map* pmArgs = dynamic_cast<bplus::Map*>( poArgs.get() );
-        
-        // Always give invoke() a map.
-        bplus::Map mapEmpty;
-        const bplus::Map& mapref = pmArgs ? *pmArgs : mapEmpty;
-        
-        ((Service*) pvInst)->invoke( cszFuncName, tran, mapref );
-    }
-    catch (bplus::ConversionException& /*exc*/ )
-    {
-        s_pCoreFuncs->postError( tid, "invalid input", "conversion exception" );
-        return;
-    }
-    // TODO: other catch's could possibly go here
-}
-
-
-inline void
-Service::setContext( const BPElement* peCtx )
-{
-    std::auto_ptr<bplus::Object> ptrCtx( bplus::Object::build( peCtx ) );
-
-    bplus::Map* pmCtx = dynamic_cast<bplus::Map*>( ptrCtx.get() );
-    if (!pmCtx) {
-        return;
-    }
-
-    typedef std::map<std::string, const bplus::Object*> tStrObjMap;
-    tStrObjMap mapCtx = *pmCtx;
-    for (tStrObjMap::const_iterator it = mapCtx.begin(); it != mapCtx.end();
-         ++it)
-    {
-        // Only add string elements.
-        if (it->second->type() == BPTString) {
-			m_mapContext.insert( std::make_pair( it->first, std::string(*it->second)) );
-        }
-    }
-}
-
-
 } // service
 } // bplus
 
 
-
 ////////////////////////////////////////////////////////////////////////////////
-// Macros
-//
-
-#define BP_SERVICE_DEFNS( className ) \
-extern "C" \
-{ \
-    const BPPFunctionTable* BPPGetEntryPoints() \
-    { \
-        return bplus::service::Service::getEntryPoints(); \
-    } \
-} \
-\
-const BPCFunctionTable* bplus::service::Service::s_pCoreFuncs = NULL; \
-const BPElement* bplus::service::Service::s_pParamMap = NULL; \
-bplus::service::Description bplus::service::Service::s_description; \
-\
-bplus::service::Service* bplus::service::Service::createInstance() \
-{ \
-    return new className(); \
-} \
-\
-typedef void (className::* tInvokableFunc)( const bplus::service::Transaction& tran, \
-                                            const bplus::Map& args );\
-std::map<std::string, tInvokableFunc> className::s_mapFuncs;
-
-
-
-#define BP_SERVICE_DESC( className, serviceName, version, docString ) \
-BP_SERVICE_DEFNS( className ); \
-const BPCoreletDefinition* bplus::service::Service::getDescription() \
-{ \
-    s_description.clear(); \
-    s_description.setName( serviceName ); \
-    s_description.setVersion( version ); \
-    s_description.setDocString( docString );
-
-
-#define ADD_BP_METHOD( className, funcName, docString ) \
-{ \
-    bplus::service::Function func; \
-    func.setName( #funcName ); \
-    func.setDocString( docString ); \
-    s_description.addFunction( func ); \
-    className::s_mapFuncs[#funcName] = &className::funcName; \
-}
-
-
-#define ADD_BP_METHOD_ARG( func, argName, argType, reqd, docString ) \
-{ \
-    bplus::service::Argument a( argName, bplus::service::Argument::argType ); \
-    a.setRequired( reqd ); \
-    a.setDocString( docString ); \
-    bplus::service::Function* pFunc = s_description.getFunction( #func ); \
-    if (pFunc) { \
-        pFunc->addArgument( a ); \
-    } \
-}
-
-
-#define END_BP_SERVICE_DESC \
-    return s_description.toBPCoreletDefinition(); \
-}
-
-
-#define BP_SERVICE( className ) \
-typedef void (className::* tInvokableFunc)( const bplus::service::Transaction& tran, \
-                                            const bplus::Map& args ); \
-static std::map<std::string, tInvokableFunc> s_mapFuncs; \
-\
-void invoke( const char* cszFuncName, \
-             const bplus::service::Transaction& tran, \
-             const bplus::Map& args ) \
-{ \
-    std::map<std::string, tInvokableFunc>::iterator it; \
-    it = s_mapFuncs.find( cszFuncName ); \
-    if (it == s_mapFuncs.end()) { \
-        tran.error( "invalid input", "method does not exist" ); \
-        return; \
-    } \
-    tInvokableFunc func = it->second; \
-    (this->*func)( tran, args ); \
-}
+// Get the implementations.
+#include "impl/bpserviceimpl.h"
 
 
 #endif // BPSERVICE_H_
