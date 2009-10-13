@@ -217,8 +217,8 @@ Service::setContext( const BPElement* peCtx )
 // Macro Magic
 //
 // Some of the functions performed:
-// * instatiate derived service
-// * Implement the required browserplus service API C functions
+// * instantiate derived service
+// * Implement the required browserplus Service API C functions
 // * route method invokations to proper service method
 //
 
