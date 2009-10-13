@@ -16,21 +16,34 @@ To use this framework:
 submodule of your project.  The projects listed above demonstrate the git
 submodule approach.
 
-2) Create a class for your service and derive it from
-bplus::service::Service.
-
-3) Add an invokation of: BP_SERVICE( YourClassName ) in your class declaration.
-
-4) Use BP_SERVICE_DESC, ADD_BP_METHOD, ADD_BP_METHOD_ARG, and
-END_BP_SERVICE_DESC macro to setup the C API of your service.
-
-5) Use Service::context() and Service::log() as needed.
-
-6) Use bplus::service::Transaction and bplus::service::Callback as needed.
-
-7) Use utility classes and functions from the bputil directory as needed.
-
-8) If you use CMake to build your service, you may find it convenient for
+2) If you use CMake to build your service, you may find it convenient for
 your CMakeLists.txt to include build_support/BuildConfigs.cmake to setup
 some default compiler/linker settings.
+
+3) Create a class for your service and derive it from
+bplus::service::Service.  Add a default (no-arg) constructor to your service.
+
+4) Add an invokation of: BP_SERVICE( YourClassName ) in your class declaration.
+
+5) Use BP_SERVICE_DESC, ADD_BP_METHOD, ADD_BP_METHOD_ARG, and
+END_BP_SERVICE_DESC macros to setup the C API of your service.
+
+6) Use Service::log() as needed.
+
+7) If you want to hook the load/unload of your service's dynamic library to 
+do work before any instances are allocated and/or after they are all destroyed,
+then override Service::onServiceLoad/Unload() with static member methods with 
+the proper signature.  If present, your method(s) will be called.
+
+8) Use Service::context() to access information about an instance's client.  
+Note you can't call this from your constructor, you must call it from an 
+override of finalConstruct() or from another of your non-static methods.
+
+9) Use Transaction::complete() and Transaction::error() to indicate method
+completion.
+
+10) Use Transaction::invokeCallback() to invoke progress callbacks.
+
+11) Use utility classes and functions from the bputil directory as needed.
+
 

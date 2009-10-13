@@ -94,6 +94,8 @@ typedef int (*BPPAllocatePtr)(void ** instance, unsigned int attachID,
     
 /**
  * Destroy a service instance allocated with BPPAllocate.
+ * 
+ *  \param instance An instance pointer returned from a BPPAllocate call.
  */
 typedef void (*BPPDestroyPtr)(void * instance);    
 
@@ -102,8 +104,7 @@ typedef void (*BPPDestroyPtr)(void * instance);
  *  by calling the invoke function and passing as a parameter the name of the
  *  function being invoked.
  *
- *  \param instance The same instance pointer that the service
- *                  returned to the BPPInitialize call.
+ *  \param instance An instance pointer returned from a BPPAllocate call.
  *  \param functionName The name of the function being invoked
  *  \param tid The transaction id of this function invocation.  Should
  *             be passed by the service to BPCPostResultsFuncPtr
