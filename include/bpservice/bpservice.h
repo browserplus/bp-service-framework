@@ -61,7 +61,7 @@ public:
     static void     log( unsigned int level,
                          const std::string& sLog );
 
-    // Called when the service's dynamic library is being loaded, prior
+    // Called when the service's dynamic library has been loaded, prior
     // to allocation of any instances.
     // Return: bool success code.
     // Derived services may override this method if desired.
