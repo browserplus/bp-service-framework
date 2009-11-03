@@ -507,9 +507,18 @@ bplus::service::Description::version() const
 inline void
 bplus::service::Description::setVersion(const bplus::service::Version& version)
 {
-    m_majorVersion = version.majorVer();
-    m_minorVersion = version.minorVer();
-    m_microVersion = version.microVer();
+    // Note: service::Version uses -1 as a "not set" indicator.
+    if (version.majorVer() >= 0) {
+        m_majorVersion = version.majorVer();
+    }
+
+    if (version.minorVer() >= 0) {
+        m_minorVersion = version.minorVer();
+    }
+
+    if (version.microVer() >= 0) {
+        m_microVersion = version.microVer();
+    }
 }
 
 inline unsigned int

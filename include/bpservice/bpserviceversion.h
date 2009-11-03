@@ -107,6 +107,7 @@ inline Version::Version()
 }
 
 inline Version::Version(const char * in)
+: m_major(-1), m_minor(-1), m_micro(-1)
 {
     if (!parse(in))
     {
