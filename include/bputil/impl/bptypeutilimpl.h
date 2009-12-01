@@ -79,7 +79,7 @@ urlEncode(const std::string& s)
     };
     
     for (unsigned int i = 0; i < s.length(); i++) {
-        if (isalnum(s[i]) || strchr(noencode, s[i]) != NULL) {
+        if (isalnum((unsigned char)s[i]) || strchr(noencode, s[i]) != NULL) {
             out.append(&s[i], 1);
         } else {
             hex[0] = '%';
