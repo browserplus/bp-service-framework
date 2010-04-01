@@ -30,14 +30,8 @@
 # Original Author: Lloyd Hilaiel
 #####
 
-# require cmake 2.6.2 or higher
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6.2 FATAL_ERROR)
- 
-# allow use with cmake 2.8 or higher
-IF (APPLE)
-   SET (CMAKE_OSX_DEPLOYMENT_TARGET "10.4"
-        CACHE STRING "Compile for tiger deployment" FORCE)
-ENDIF ()
+# require cmake 2.8.1 or higher
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.1 FATAL_ERROR)
 
 IF (POLICY CMP0011)
   cmake_policy(SET CMP0011 OLD)
@@ -98,6 +92,20 @@ IF(WIN32)
 ELSE ()
     SET(isysrootFlag)
     IF (APPLE)
+      # Must tell cmake that we really, really, really want gcc-4.0
+      INCLUDE(CMakeForceCompiler)
+      CMAKE_FORCE_C_COMPILER(gcc-4.0 GNU)
+      CMAKE_FORCE_CXX_COMPILER(gcc-4.0 GNU)
+
+      # now tell cmake to tell xcode that we really, really, really,
+      # want gcc-4.0
+      SET( CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "4.0"
+           CACHE STRING "BrowserPlus debug CXX flags" FORCE )
+
+      # and we want 32bit i386 for osx 10.4
+      SET(CMAKE_OSX_ARCHITECTURES i386)
+      Set (CMAKE_OSX_DEPLOYMENT_TARGET "10.4"
+	       CACHE STRING "Compile for tiger deployment" FORCE)
       SET (CMAKE_OSX_SYSROOT "/Developer/SDKs/MacOSX10.4u.sdk"
 CACHE STRING "Compile for tiger backwards compat" FORCE)
       SET(isysrootFlag "-isysroot ${CMAKE_OSX_SYSROOT}")
