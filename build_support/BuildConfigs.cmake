@@ -132,55 +132,55 @@ ELSE ()
   SET(CMAKE_SHARED_LINKER_FLAGS_RELEASE "-Wl,-x")
 ENDIF ()
 
-MACRO (BPAddCPPService serviceName)
+MACRO (BPAddCPPService)
+  IF (NOT DEFINED SERVICE_NAME)
+    MESSAGE(FATAL_ERROR, "$SERVICE_NAME is not defined, please add service name")
+  ENDIF ()
   IF (NOT DEFINED SRCS)
     MESSAGE(FATAL_ERROR, "$SRCS is not defined, please add some source files")
   ENDIF ()
   IF (NOT DEFINED HDRS)
-    MESSAGE(FATAL_ERROR, "$HDRS is not defined, please add some source files")
+    MESSAGE(FATAL_ERROR, "$HDRS is not defined, please add some headers")
   ENDIF ()
   IF (NOT DEFINED LIBS)
-    MESSAGE(FATAL_ERROR, "$LIBSS is not defined, please add some source files")
+    MESSAGE(FATAL_ERROR, "$LIBSS is not defined, please add some libs")
   ENDIF ()
   #
-  # Initialize the project.
-  PROJECT(${serviceName}Service)
-  #
   # Add output directory.
-  SET(outputDir "${CMAKE_CURRENT_BINARY_DIR}/${serviceName}")
+  SET(outputDir "${CMAKE_CURRENT_BINARY_DIR}/${SERVICE_NAME}")
   FILE(MAKE_DIRECTORY ${outputDir})
   #
   # Add actual target.
-  ADD_LIBRARY(${serviceName} MODULE ${HDRS} ${SRCS})
-  TARGET_LINK_LIBRARIES(${serviceName} ${LIBS})
+  ADD_LIBRARY(${SERVICE_NAME} MODULE ${HDRS} ${SRCS})
+  TARGET_LINK_LIBRARIES(${SERVICE_NAME} ${LIBS})
   #
   # Pre-build step, build our externals.
-  ADD_CUSTOM_TARGET(${serviceName}Externals ALL
+  ADD_CUSTOM_TARGET(${SERVICE_NAME}Externals ALL
                     COMMAND ruby build.rb
                     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../external"
                     COMMENT Building externals...)
-  ADD_DEPENDENCIES(${serviceName} ${serviceName}Externals)
+  ADD_DEPENDENCIES(${SERVICE_NAME} ${SERVICE_NAME}Externals)
   #
   # Copy in manifest.
-  GET_TARGET_PROPERTY(loc ${serviceName} LOCATION)
+  GET_TARGET_PROPERTY(loc ${SERVICE_NAME} LOCATION)
   CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/manifest.json"
                  "${outputDir}/manifest.json")  
-  ADD_CUSTOM_COMMAND(TARGET ${serviceName} POST_BUILD
+  ADD_CUSTOM_COMMAND(TARGET ${SERVICE_NAME} POST_BUILD
                      COMMAND ${CMAKE_COMMAND} -E copy_if_different
                              \"${loc}\" \"${outputDir}\")
   # Strip non-debug unix/osx builds.
   IF (NOT WIN32)
     IF (${CMAKE_BUILD_TYPE} STREQUAL "Release")
       GET_FILENAME_COMPONENT(ServiceLibrary "${loc}" NAME)
-      ADD_CUSTOM_COMMAND(TARGET ${serviceName} POST_BUILD
+      ADD_CUSTOM_COMMAND(TARGET ${SERVICE_NAME} POST_BUILD
                          COMMAND cmake -E echo "stripping \"${outputDir}/${ServiceLibrary}\""
                          COMMAND strip -x \"${outputDir}/${ServiceLibrary}\")
     ENDIF ()
   ENDIF ()
 ENDMACRO ()
 
-MACRO (BPAddPythonService serviceName)
+MACRO (BPAddPythonService)
 ENDMACRO ()
 
-MACRO (BPAddRubyService serviceName)
+MACRO (BPAddRubyService)
 ENDMACRO ()
