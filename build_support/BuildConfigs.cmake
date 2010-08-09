@@ -183,4 +183,46 @@ MACRO (BPAddPythonService)
 ENDMACRO ()
 
 MACRO (BPAddRubyService)
+  IF (NOT DEFINED SERVICE_NAME)
+    MESSAGE(FATAL_ERROR, "$SERVICE_NAME is not defined, please add service name")
+  ENDIF ()
+  IF (NOT DEFINED SRCS)
+    MESSAGE(FATAL_ERROR, "$SRCS is not defined, please add some source files")
+  ENDIF ()
+  IF (NOT DEFINED HDRS)
+    MESSAGE(FATAL_ERROR, "$HDRS is not defined, please add some headers")
+  ENDIF ()
+  IF (NOT DEFINED LIBS)
+    MESSAGE(FATAL_ERROR, "$LIBSS is not defined, please add some libs")
+  ENDIF ()
+  #
+  # Add output directory.
+  SET(outputDir "${CMAKE_CURRENT_BINARY_DIR}/${SERVICE_NAME}")
+  FILE(MAKE_DIRECTORY ${outputDir})
+  #
+  # Add actual target.
+  SET(allDeps)
+  FOREACH(src ${srcs})
+    SET(mySrc "${CMAKE_CURRENT_SOURCE_DIR}/${src}")
+    SET(myDst "${outputDir}/${src}")
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${myDst}
+      DEPENDS ${mySrc}
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different ${mySrc} ${myDst}
+    )
+    SET(allDeps ${allDeps} ${myDst})
+  ENDFOREACH()
+  ADD_CUSTOM_TARGET(${SERVICE_NAME} ALL DEPENDS ${allDeps})
+  #
+  # Pre-build step, build our externals.
+  ADD_CUSTOM_TARGET(${SERVICE_NAME}Externals ALL
+                    COMMAND ruby build.rb
+                    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../external"
+                    COMMENT Building externals...)
+  ADD_DEPENDENCIES(${SERVICE_NAME} ${SERVICE_NAME}Externals)
+  #
+  # Copy in manifest.
+  GET_TARGET_PROPERTY(loc ${SERVICE_NAME} LOCATION)
+  CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/manifest.json"
+                 "${outputDir}/manifest.json")  
 ENDMACRO ()
