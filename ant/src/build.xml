@@ -1,11 +1,5 @@
-<project name="${ServiceName}_src" default="build_release">
-    <fail message="ServiceName property not set">
-        <condition>
-            <not>
-                <isset property="ServiceName"/>
-            </not>
-        </condition>
-    </fail>
+<project name="src_template" default="build_release">
+    <property file="../build.properties" />
     <fail message="ServiceSolution property not set">
         <condition>
             <not>

@@ -1,11 +1,5 @@
-<project name="${ServiceName}" default="build_release">
-    <fail message="ServiceName property not set">
-        <condition>
-            <not>
-                <isset property="ServiceName"/>
-            </not>
-        </condition>
-    </fail>
+<project name="root_template" default="build_release">
+    <property file="build.properties" />
     <condition property="is.windows">
         <os family="windows" />
     </condition>

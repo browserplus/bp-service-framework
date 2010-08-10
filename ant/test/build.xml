@@ -1,11 +1,5 @@
-<project name="${ServiceName}_test" default="build_release">
-    <fail message="ServiceName property not set">
-        <condition>
-            <not>
-                <isset property="ServiceName"/>
-            </not>
-        </condition>
-    </fail>
+<project name="test_template" default="build_release">
+    <property file="../build.properties" />
     <fail message="ServiceDirectory_make_codecoverage property not set">
         <condition>
             <not>
