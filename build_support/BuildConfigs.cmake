@@ -114,16 +114,16 @@ ELSE ()
     SET(CMAKE_XCODE_ATTRIBUTE_ARCHS i386)
 
     IF ("${CMAKE_BUILD_TYPE}" STREQUAL "CodeCoverage")
-      # and we 32bit i386 for osx 10.5
+      # and we 32bit i386 for osx 10.6
       SET(CMAKE_OSX_ARCHITECTURES i386)
-      SET (CMAKE_OSX_DEPLOYMENT_TARGET "10.5"
-        CACHE STRING "Compile for leopard deployment" FORCE)
-      SET(CMAKE_OSX_SYSROOT "/Developer/SDKs/MacOSX10.5.sdk"
-          CACHE STRING "Compile for leopard backwards compat" FORCE)
+      SET (CMAKE_OSX_DEPLOYMENT_TARGET "10.6"
+        CACHE STRING "Compile for snow leopard deployment" FORCE)
+      SET(CMAKE_OSX_SYSROOT "/Developer/SDKs/MacOSX10.6.sdk"
+          CACHE STRING "Compile for snow leopard backwards compat" FORCE)
       SET(isysrootFlag "-isysroot ${CMAKE_OSX_SYSROOT}")
-      SET(minVersionFlag "-mmacosx-version-min=10.5")
+      SET(minVersionFlag "-mmacosx-version-min=10.6")
       SET(CMAKE_FRAMEWORK_PATH "${CMAKE_OSX_SYSROOT}/System/Library/Frameworks"
-          CACHE STRING "use 10.5 frameworks" FORCE)
+          CACHE STRING "use 10.6 frameworks" FORCE)
     ELSE ()
       # and we 32bit i386 for osx 10.4
       SET(CMAKE_OSX_ARCHITECTURES i386)
