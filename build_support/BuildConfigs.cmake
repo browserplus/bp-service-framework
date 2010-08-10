@@ -195,7 +195,7 @@ MACRO (BPAddCPPService)
                              \"${loc}\" \"${OUTPUT_DIR}\")
   # Strip non-debug unix/osx builds.
   IF (NOT WIN32)
-    IF (${CMAKE_BUILD_TYPE} STREQUAL "Release")
+    IF ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
       ADD_CUSTOM_COMMAND(TARGET ${SERVICE_NAME} POST_BUILD
                          COMMAND cmake -E echo "stripping \"${OUTPUT_DIR}/${SERVICE_LIBRARY}\""
                          COMMAND strip -x \"${OUTPUT_DIR}/${SERVICE_LIBRARY}\")
