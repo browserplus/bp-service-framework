@@ -163,6 +163,7 @@ MACRO (BPAddCPPService)
   #
   # Copy in manifest.
   GET_TARGET_PROPERTY(loc ${SERVICE_NAME} LOCATION)
+  GET_FILENAME_COMPONENT(ServiceLibrary "${loc}" NAME)
   CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/manifest.json"
                  "${OUTPUT_DIR}/manifest.json")  
   ADD_CUSTOM_COMMAND(TARGET ${SERVICE_NAME} POST_BUILD
@@ -171,7 +172,6 @@ MACRO (BPAddCPPService)
   # Strip non-debug unix/osx builds.
   IF (NOT WIN32)
     IF (${CMAKE_BUILD_TYPE} STREQUAL "Release")
-      GET_FILENAME_COMPONENT(ServiceLibrary "${loc}" NAME)
       ADD_CUSTOM_COMMAND(TARGET ${SERVICE_NAME} POST_BUILD
                          COMMAND cmake -E echo "stripping \"${OUTPUT_DIR}/${ServiceLibrary}\""
                          COMMAND strip -x \"${OUTPUT_DIR}/${ServiceLibrary}\")
@@ -223,6 +223,7 @@ MACRO (BPAddRubyService)
   #
   # Copy in manifest.
   GET_TARGET_PROPERTY(loc ${SERVICE_NAME} LOCATION)
+  GET_FILENAME_COMPONENT(ServiceLibrary "${loc}" NAME)
   CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/manifest.json"
                  "${OUTPUT_DIR}/manifest.json")  
 ENDMACRO ()
