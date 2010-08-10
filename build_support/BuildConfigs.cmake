@@ -39,7 +39,7 @@ ENDIF (POLICY CMP0011)
 CMAKE_POLICY(SET CMP0003 NEW)
 CMAKE_POLICY(SET CMP0009 NEW)
 
-SET (CMAKE_CONFIGURATION_TYPES Debug Release
+SET (CMAKE_CONFIGURATION_TYPES Debug Release CodeCoverage
      CACHE STRING "bp-service-framework build configs" FORCE)
 
 # Reduce redundancy in the cmake language.
@@ -58,21 +58,27 @@ IF (WIN32)
       CACHE STRING "BrowserPlus CXX flags" FORCE)
   SET(CMAKE_CXX_FLAGS_DEBUG "/MTd /DDEBUG /D_DEBUG /Od /RTC1 /RTCc"
       CACHE STRING "BrowserPlus debug CXX flags" FORCE)
+  SET(CMAKE_CXX_FLAGS_CODECOVERAGE "${CMAKE_CXX_FLAGS_CODECOVERAGE}"
+      CACHE STRING "BrowserPlus code coverage CXX flags" FORCE)
   SET(CMAKE_CXX_FLAGS_RELEASE "/MT /DNDEBUG /O1"
       CACHE STRING "BrowserPlus release CXX flags" FORCE)
 
   # libs to ignore, from http://msdn.microsoft.com/en-us/library/aa267384.aspx
   #
   SET(noDefaultLibFlagsDebug "/NODEFAULTLIB:libc.lib /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:msvcrt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:msvcrtd.lib")
+  SET(noDefaultLibFlagsCodeCoverage ${noDefaultLibFlagsDebug})
   SET(noDefaultLibFlagsRelease "/NODEFAULTLIB:libc.lib /NODEFAULTLIB:msvcrt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrtd.lib")
 
   SET(linkFlags "/DEBUG /MANIFEST:NO")
   SET(linkFlagsDebug " ${noDefaultLibFlagsDebug}")
+  SET(linkFlagsCodeCoverage " ${linkFlagsDebug}")
   SET(linkFlagsRelease " /INCREMENTAL:NO /OPT:REF /OPT:ICF ${noDefaultLibFlagsRelease}")
 
   SET(CMAKE_EXE_LINKER_FLAGS "${linkFlags}"
       CACHE STRING "BrowserPlus linker flags" FORCE)
   SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${linkFlagsDebug}"
+      CACHE STRING "BrowserPlus debug linker flags" FORCE)
+  SET(CMAKE_EXE_LINKER_FLAGS_CODECOVERAGE "${CMAKE_EXE_LINKER_FLAGS_DEBUG}"
       CACHE STRING "BrowserPlus debug linker flags" FORCE)
   SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${linkFlagsRelease}"
       CACHE STRING "BrowserPlus release linker flags" FORCE)
@@ -80,12 +86,16 @@ IF (WIN32)
       CACHE STRING "BrowserPlus shared linker flags" FORCE)
   SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${linkFlagsDebug}"
       CACHE STRING "BrowserPlus shared debug linker flags" FORCE)
+  SET(CMAKE_SHARED_LINKER_FLAGS_CODECOVERAGE "${CMAKE_SHARED_LINKER_FLAGS_DEBUG}"
+      CACHE STRING "BrowserPlus shared debug linker flags" FORCE)
   SET(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${linkFlagsRelease}"
       CACHE STRING "BrowserPlus shared release linker flags" FORCE)
 
   SET(CMAKE_MODULE_LINKER_FLAGS "${linkFlags}"
       CACHE STRING "BrowserPlus module linker flags" FORCE)
   SET(CMAKE_MODULE_LINKER_FLAGS_DEBUG "${linkFlagsDebug}"
+      CACHE STRING "BrowserPlus module debug linker flags" FORCE)
+  SET(CMAKE_MODULE_LINKER_FLAGS_CODECOVERAGE "${CMAKE_MODULE_LINKER_FLAGS_DEBUG}"
       CACHE STRING "BrowserPlus module debug linker flags" FORCE)
   SET(CMAKE_MODULE_LINKER_FLAGS_RELEASE "${linkFlagsRelease}"
       CACHE STRING "BrowserPlus module release linker flags" FORCE)
@@ -126,6 +136,7 @@ ELSE ()
 
   SET(CMAKE_CXX_FLAGS "-Wall ${isysrootFlag} ${minVersionFlag}")
   SET(CMAKE_CXX_FLAGS_DEBUG "-DDEBUG -g")
+  SET(CMAKE_CXX_FLAGS_CODECOVERAGE "${CMAKE_CXX_FLAGS_DEBUG} -fprofile-arcs -ftest-coverage")
   SET(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -Os")
   SET(CMAKE_MODULE_LINKER_FLAGS_RELEASE "-Wl,-x")
   SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "-Wl,-x")
