@@ -163,7 +163,7 @@ MACRO (BPAddCPPService)
   #
   # Copy in manifest.
   GET_TARGET_PROPERTY(loc ${SERVICE_NAME} LOCATION)
-  GET_FILENAME_COMPONENT(ServiceLibrary "${loc}" NAME)
+  GET_FILENAME_COMPONENT(SERVICE_LIBRARY "${loc}" NAME)
   CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/manifest.json"
                  "${OUTPUT_DIR}/manifest.json")  
   ADD_CUSTOM_COMMAND(TARGET ${SERVICE_NAME} POST_BUILD
@@ -173,13 +173,56 @@ MACRO (BPAddCPPService)
   IF (NOT WIN32)
     IF (${CMAKE_BUILD_TYPE} STREQUAL "Release")
       ADD_CUSTOM_COMMAND(TARGET ${SERVICE_NAME} POST_BUILD
-                         COMMAND cmake -E echo "stripping \"${OUTPUT_DIR}/${ServiceLibrary}\""
-                         COMMAND strip -x \"${OUTPUT_DIR}/${ServiceLibrary}\")
+                         COMMAND cmake -E echo "stripping \"${OUTPUT_DIR}/${SERVICE_LIBRARY}\""
+                         COMMAND strip -x \"${OUTPUT_DIR}/${SERVICE_LIBRARY}\")
     ENDIF ()
   ENDIF ()
 ENDMACRO ()
 
 MACRO (BPAddPythonService)
+  IF (NOT DEFINED SERVICE_NAME)
+    MESSAGE(FATAL_ERROR, "$SERVICE_NAME is not defined, please add service name")
+  ENDIF ()
+  IF (NOT DEFINED SRCS)
+    MESSAGE(FATAL_ERROR, "$SRCS is not defined, please add some source files")
+  ENDIF ()
+  IF (NOT DEFINED HDRS)
+    MESSAGE(FATAL_ERROR, "$HDRS is not defined, please add some headers")
+  ENDIF ()
+  IF (NOT DEFINED LIBS)
+    MESSAGE(FATAL_ERROR, "$LIBSS is not defined, please add some libs")
+  ENDIF ()
+  #
+  # Add output directory.
+  SET(OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/${SERVICE_NAME}")
+  FILE(MAKE_DIRECTORY ${OUTPUT_DIR})
+  #
+  # Add actual target.
+  SET(ALL_DEPS)
+  FOREACH(SRC ${SRCS})
+    SET(MY_SRC "${CMAKE_CURRENT_SOURCE_DIR}/${SRC}")
+    SET(MY_DST "${OUTPUT_DIR}/${SRC}")
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${MY_DST}
+      DEPENDS ${MY_SRC}
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different ${MY_SRC} ${MY_DST}
+    )
+    SET(ALL_DEPS ${ALL_DEPS} ${MY_DST})
+  ENDFOREACH()
+  ADD_CUSTOM_TARGET(${SERVICE_NAME} ALL DEPENDS ${ALL_DEPS})
+  #
+  # Pre-build step, build our externals.
+  ADD_CUSTOM_TARGET(${SERVICE_NAME}Externals ALL
+                    COMMAND ruby build.rb
+                    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../external"
+                    COMMENT Building externals...)
+  ADD_DEPENDENCIES(${SERVICE_NAME} ${SERVICE_NAME}Externals)
+  #
+  # Copy in manifest.
+  GET_TARGET_PROPERTY(loc ${SERVICE_NAME} LOCATION)
+  GET_FILENAME_COMPONENT(SERVICE_LIBRARY "${loc}" NAME)
+  CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/manifest.json"
+                 "${OUTPUT_DIR}/manifest.json")  
 ENDMACRO ()
 
 MACRO (BPAddRubyService)
@@ -223,7 +266,7 @@ MACRO (BPAddRubyService)
   #
   # Copy in manifest.
   GET_TARGET_PROPERTY(loc ${SERVICE_NAME} LOCATION)
-  GET_FILENAME_COMPONENT(ServiceLibrary "${loc}" NAME)
+  GET_FILENAME_COMPONENT(SERVICE_LIBRARY "${loc}" NAME)
   CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/manifest.json"
                  "${OUTPUT_DIR}/manifest.json")  
 ENDMACRO ()
