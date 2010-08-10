@@ -113,16 +113,29 @@ ELSE ()
          CACHE STRING "BrowserPlus debug CXX flags" FORCE )
     SET(CMAKE_XCODE_ATTRIBUTE_ARCHS i386)
 
-    # and we 32bit i386 for osx 10.4
-    SET(CMAKE_OSX_ARCHITECTURES i386)
-    SET (CMAKE_OSX_DEPLOYMENT_TARGET "10.4"
-      CACHE STRING "Compile for tiger deployment" FORCE)
-    SET(CMAKE_OSX_SYSROOT "/Developer/SDKs/MacOSX10.4u.sdk"
-        CACHE STRING "Compile for tiger backwards compat" FORCE)
-    SET(isysrootFlag "-isysroot ${CMAKE_OSX_SYSROOT}")
-    SET(minVersionFlag "-mmacosx-version-min=10.4")
-    SET(CMAKE_FRAMEWORK_PATH "${CMAKE_OSX_SYSROOT}/System/Library/Frameworks"
-        CACHE STRING "use 10.4 frameworks" FORCE)
+    IF ("${CMAKE_BUILD_TYPE}" STREQUAL "CodeCoverage")
+      # and we 32bit i386 for osx 10.5
+      SET(CMAKE_OSX_ARCHITECTURES i386)
+      SET (CMAKE_OSX_DEPLOYMENT_TARGET "10.5"
+        CACHE STRING "Compile for leopard deployment" FORCE)
+      SET(CMAKE_OSX_SYSROOT "/Developer/SDKs/MacOSX10.5.sdk"
+          CACHE STRING "Compile for leopard backwards compat" FORCE)
+      SET(isysrootFlag "-isysroot ${CMAKE_OSX_SYSROOT}")
+      SET(minVersionFlag "-mmacosx-version-min=10.5")
+      SET(CMAKE_FRAMEWORK_PATH "${CMAKE_OSX_SYSROOT}/System/Library/Frameworks"
+          CACHE STRING "use 10.5 frameworks" FORCE)
+    ELSE ()
+      # and we 32bit i386 for osx 10.4
+      SET(CMAKE_OSX_ARCHITECTURES i386)
+      SET (CMAKE_OSX_DEPLOYMENT_TARGET "10.4"
+        CACHE STRING "Compile for tiger deployment" FORCE)
+      SET(CMAKE_OSX_SYSROOT "/Developer/SDKs/MacOSX10.4u.sdk"
+          CACHE STRING "Compile for tiger backwards compat" FORCE)
+      SET(isysrootFlag "-isysroot ${CMAKE_OSX_SYSROOT}")
+      SET(minVersionFlag "-mmacosx-version-min=10.4")
+      SET(CMAKE_FRAMEWORK_PATH "${CMAKE_OSX_SYSROOT}/System/Library/Frameworks"
+          CACHE STRING "use 10.4 frameworks" FORCE)
+    ENDIF ()
 
     SET(CMAKE_MODULE_LINKER_FLAGS "${minVersionFlag} ${isysrootFlag}")
     SET(CMAKE_EXE_LINKER_FLAGS "-dead_strip -dead_strip_dylibs ${minVersionFlag} ${isysrootFlag}")
