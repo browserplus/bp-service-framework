@@ -1,0 +1,156 @@
+<project name="${ServiceName}_test" default="build_release">
+    <fail message="ServiceName property not set">
+        <condition>
+            <not>
+                <isset property="ServiceName"/>
+            </not>
+        </condition>
+    </fail>
+    <fail message="ServiceDirectory_make_codecoverage property not set">
+        <condition>
+            <not>
+                <isset property="ServiceDirectory_make_codecoverage"/>
+            </not>
+        </condition>
+    </fail>
+    <fail message="ServiceDirectory_make_debug property not set">
+        <condition>
+            <not>
+                <isset property="ServiceDirectory_make_debug"/>
+            </not>
+        </condition>
+    </fail>
+    <fail message="ServiceDirectory_make_release property not set">
+        <condition>
+            <not>
+                <isset property="ServiceDirectory_make_release"/>
+            </not>
+        </condition>
+    </fail>
+    <fail message="ServiceDirectory_vc08_codecoverage property not set">
+        <condition>
+            <not>
+                <isset property="ServiceDirectory_vc08_codecoverage"/>
+            </not>
+        </condition>
+    </fail>
+    <fail message="ServiceDirectory_vc08_debug property not set">
+        <condition>
+            <not>
+                <isset property="ServiceDirectory_vc08_debug"/>
+            </not>
+        </condition>
+    </fail>
+    <fail message="ServiceDirectory_vc08_release property not set">
+        <condition>
+            <not>
+                <isset property="ServiceDirectory_vc08_release"/>
+            </not>
+        </condition>
+    </fail>
+    <condition property="is.windows">
+        <os family="windows" />
+    </condition>
+    <condition property="is.mac">
+        <os family="mac" />
+    </condition>
+    <condition property="is.unix">
+        <os family="unix" />
+    </condition>
+    <target name="clean_make_codecoverage" unless="is.windows">
+        <!-- NO-OP -->
+    </target>
+    <target name="clean_make_debug" unless="is.windows">
+        <!-- NO-OP -->
+    </target>
+    <target name="clean_make_release" unless="is.windows">
+        <!-- NO-OP -->
+    </target>
+    <target name="clean_vc08_codecoverage" if="is.windows">
+        <!-- NO-OP -->
+    </target>
+    <target name="clean_vc08_debug" if="is.windows">
+        <!-- NO-OP -->
+    </target>
+    <target name="clean_vc08_release" if="is.windows">
+        <!-- NO-OP -->
+    </target>
+    <target name="build_make_codecoverage" unless="is.windows">
+        <!-- NO-OP -->
+    </target>
+    <target name="build_make_debug" unless="is.windows">
+        <!-- NO-OP -->
+    </target>
+    <target name="build_make_release" unless="is.windows">
+        <!-- NO-OP -->
+    </target>
+    <target name="build_vc08_codecoverage" if="is.windows">
+        <!-- NO-OP -->
+    </target>
+    <target name="build_vc08_debug" if="is.windows">
+        <!-- NO-OP -->
+    </target>
+    <target name="build_vc08_release" if="is.windows">
+        <!-- NO-OP -->
+    </target>
+    <target name="test_make_codecoverage" unless="is.windows">
+        <exec executable="ruby" failonerror="true">
+            <env key="BP_OUTPUT_DIR" value="build_codecoverage/${ServiceDirectory_make_codecoverage}" />
+            <arg line="./runtests.rb --runner cppunit_runner" />
+        </exec>
+    </target>
+    <target name="test_make_debug" unless="is.windows">
+        <exec executable="ruby" failonerror="true">
+            <env key="BP_OUTPUT_DIR" value="build_debug/${ServiceDirectory_make_debug}" />
+            <arg line="./runtests.rb --runner cppunit_runner" />
+        </exec>
+    </target>
+    <target name="test_make_release" unless="is.windows">
+        <exec executable="ruby" failonerror="true">
+            <env key="BP_OUTPUT_DIR" value="build_release/${ServiceDirectory_make_release}" />
+            <arg line="./runtests.rb --runner cppunit_runner" />
+        </exec>
+    </target>
+    <target name="test_vc08_codecoverage" if="is.windows">
+        <delete file="x1.bat" />
+        <echo file="x1.bat">@echo off
+set BP_OUTPUT_DIR=build/${ServiceDirectory_vc08_codecoverage}
+ruby .\runtests.rb --runner cppunit_runner
+        </echo>
+        <exec executable="cmd" failonerror="true">
+            <arg line="/C x1.bat" />
+        </exec>
+        <delete file="x1.bat" />
+    </target>
+    <target name="test_vc08_debug" if="is.windows">
+        <delete file="x1.bat" />
+        <echo file="x1.bat">@echo off
+set BP_OUTPUT_DIR=build/${ServiceDirectory_vc08_debug}
+ruby .\runtests.rb --runner cppunit_runner
+        </echo>
+        <exec executable="cmd" failonerror="true">
+            <arg line="/C x1.bat" />
+        </exec>
+        <delete file="x1.bat" />
+    </target>
+    <target name="test_vc08_release" if="is.windows">
+        <delete file="x1.bat" />
+        <echo file="x1.bat">@echo off
+set BP_OUTPUT_DIR=build/${ServiceDirectory_vc08_release}
+ruby .\runtests.rb --runner cppunit_runner
+        </echo>
+        <exec executable="cmd" failonerror="true">
+            <arg line="/C x1.bat" />
+        </exec>
+        <delete file="x1.bat" />
+    </target>
+    <target name="clean_codecoverage" depends="clean_make_codecoverage,clean_vc08_codecoverage" />
+    <target name="clean_debug" depends="clean_make_debug,clean_vc08_debug" />
+    <target name="clean_release" depends="clean_make_release,clean_vc08_release" />
+    <target name="build_codecoverage" depends="build_make_codecoverage,build_vc08_codecoverage" />
+    <target name="build_debug" depends="build_make_debug,build_vc08_debug" />
+    <target name="build_release" depends="build_make_release,build_vc08_release" />
+    <target name="test_codecoverage" depends="test_make_codecoverage,test_vc08_codecoverage" />
+    <target name="test_debug" depends="test_make_debug,test_vc08_debug" />
+    <target name="test_release" depends="test_make_release,test_vc08_release" />
+</project>
