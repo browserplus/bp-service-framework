@@ -147,8 +147,8 @@ MACRO (BPAddCPPService)
   ENDIF ()
   #
   # Add output directory.
-  SET(outputDir "${CMAKE_CURRENT_BINARY_DIR}/${SERVICE_NAME}")
-  FILE(MAKE_DIRECTORY ${outputDir})
+  SET(OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/${SERVICE_NAME}")
+  FILE(MAKE_DIRECTORY ${OUTPUT_DIR})
   #
   # Add actual target.
   ADD_LIBRARY(${SERVICE_NAME} MODULE ${HDRS} ${SRCS})
@@ -164,17 +164,17 @@ MACRO (BPAddCPPService)
   # Copy in manifest.
   GET_TARGET_PROPERTY(loc ${SERVICE_NAME} LOCATION)
   CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/manifest.json"
-                 "${outputDir}/manifest.json")  
+                 "${OUTPUT_DIR}/manifest.json")  
   ADD_CUSTOM_COMMAND(TARGET ${SERVICE_NAME} POST_BUILD
                      COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                             \"${loc}\" \"${outputDir}\")
+                             \"${loc}\" \"${OUTPUT_DIR}\")
   # Strip non-debug unix/osx builds.
   IF (NOT WIN32)
     IF (${CMAKE_BUILD_TYPE} STREQUAL "Release")
       GET_FILENAME_COMPONENT(ServiceLibrary "${loc}" NAME)
       ADD_CUSTOM_COMMAND(TARGET ${SERVICE_NAME} POST_BUILD
-                         COMMAND cmake -E echo "stripping \"${outputDir}/${ServiceLibrary}\""
-                         COMMAND strip -x \"${outputDir}/${ServiceLibrary}\")
+                         COMMAND cmake -E echo "stripping \"${OUTPUT_DIR}/${ServiceLibrary}\""
+                         COMMAND strip -x \"${OUTPUT_DIR}/${ServiceLibrary}\")
     ENDIF ()
   ENDIF ()
 ENDMACRO ()
@@ -197,22 +197,22 @@ MACRO (BPAddRubyService)
   ENDIF ()
   #
   # Add output directory.
-  SET(outputDir "${CMAKE_CURRENT_BINARY_DIR}/${SERVICE_NAME}")
-  FILE(MAKE_DIRECTORY ${outputDir})
+  SET(OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/${SERVICE_NAME}")
+  FILE(MAKE_DIRECTORY ${OUTPUT_DIR})
   #
   # Add actual target.
-  SET(allDeps)
-  FOREACH(src ${srcs})
-    SET(mySrc "${CMAKE_CURRENT_SOURCE_DIR}/${src}")
-    SET(myDst "${outputDir}/${src}")
+  SET(ALL_DEPS)
+  FOREACH(SRC ${SRCS})
+    SET(MY_SRC "${CMAKE_CURRENT_SOURCE_DIR}/${SRC}")
+    SET(MY_DST "${OUTPUT_DIR}/${SRC}")
     ADD_CUSTOM_COMMAND(
-      OUTPUT ${myDst}
-      DEPENDS ${mySrc}
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different ${mySrc} ${myDst}
+      OUTPUT ${MY_DST}
+      DEPENDS ${MY_SRC}
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different ${MY_SRC} ${MY_DST}
     )
-    SET(allDeps ${allDeps} ${myDst})
+    SET(ALL_DEPS ${ALL_DEPS} ${MY_DST})
   ENDFOREACH()
-  ADD_CUSTOM_TARGET(${SERVICE_NAME} ALL DEPENDS ${allDeps})
+  ADD_CUSTOM_TARGET(${SERVICE_NAME} ALL DEPENDS ${ALL_DEPS})
   #
   # Pre-build step, build our externals.
   ADD_CUSTOM_TARGET(${SERVICE_NAME}Externals ALL
@@ -224,5 +224,5 @@ MACRO (BPAddRubyService)
   # Copy in manifest.
   GET_TARGET_PROPERTY(loc ${SERVICE_NAME} LOCATION)
   CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/manifest.json"
-                 "${outputDir}/manifest.json")  
+                 "${OUTPUT_DIR}/manifest.json")  
 ENDMACRO ()
