@@ -52,22 +52,22 @@
         <os family="unix" />
     </condition>
     <target name="clean_make_codecoverage" unless="is.windows">
-        <!-- NO-OP -->
+        <delete file="runtests.xml" />
     </target>
     <target name="clean_make_debug" unless="is.windows">
-        <!-- NO-OP -->
+        <delete file="runtests.xml" />
     </target>
     <target name="clean_make_release" unless="is.windows">
-        <!-- NO-OP -->
+        <delete file="runtests.xml" />
     </target>
     <target name="clean_vc08_codecoverage" if="is.windows">
-        <!-- NO-OP -->
+        <delete file="runtests.xml" />
     </target>
     <target name="clean_vc08_debug" if="is.windows">
-        <!-- NO-OP -->
+        <delete file="runtests.xml" />
     </target>
     <target name="clean_vc08_release" if="is.windows">
-        <!-- NO-OP -->
+        <delete file="runtests.xml" />
     </target>
     <target name="build_make_codecoverage" unless="is.windows">
         <!-- NO-OP -->
@@ -79,13 +79,13 @@
         <!-- NO-OP -->
     </target>
     <target name="build_vc08_codecoverage" if="is.windows">
-        <delete file="runtests.xml" />
+        <!-- NO-OP -->
     </target>
     <target name="build_vc08_debug" if="is.windows">
-        <delete file="runtests.xml" />
+        <!-- NO-OP -->
     </target>
     <target name="build_vc08_release" if="is.windows">
-        <delete file="runtests.xml" />
+        <!-- NO-OP -->
     </target>
     <target name="test_make_codecoverage" unless="is.windows">
         <exec executable="ruby" failonerror="true">
