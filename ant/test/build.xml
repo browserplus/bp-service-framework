@@ -98,10 +98,14 @@
         <delete dir="../build_codecoverage/lcov_results" />
         <mkdir dir="../build_codecoverage/lcov_results" />
         <exec executable="lcov" dir="../build_codecoverage/lcov_results">
-            <arg line="--directory ../CMakeFiles/${ServiceName}.dir --capture --output-file app.info --gcov-tool /usr/bin/gcov-4.0" />
+            <arg line="--capture --directory ../CMakeFiles/${ServiceName}.dir --output-file lcov.info.tmp --gcov-tool /usr/bin/gcov-4.0" />
         </exec>
+        <exec executable="lcov" dir="../build_codecoverage/lcov_results">
+            <arg line="--remove lcov.info.tmp ${CoverageStrip_make} --output-file lcov.info" />
+        </exec>
+        <delete dir="../build_codecoverage/lcov_results/lcov-report" />
         <exec executable="genhtml" dir="../build_codecoverage/lcov_results">
-            <arg line="app.info" />
+            <arg line="--output-directory lcov-report lcov.info" />
         </exec>
     </target>
     <target name="test_make_debug" unless="is.windows">
