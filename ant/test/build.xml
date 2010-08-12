@@ -88,9 +88,20 @@
         <!-- NO-OP -->
     </target>
     <target name="test_make_codecoverage" unless="is.windows">
+        <exec executable="lcov" dir="../build_codecoverage">
+            <arg line="--directory CMakeFiles/${ServiceName}.dir --zerocounters" />
+        </exec>
         <exec executable="ruby" failonerror="true">
             <env key="BP_OUTPUT_DIR" value="build_codecoverage/${ServiceDirectory_make_codecoverage}" />
             <arg line="./runtests.rb --runner cppunit_runner" />
+        </exec>
+        <delete dir="../build_codecoverage/lcov_results" />
+        <mkdir dir="../build_codecoverage/lcov_results" />
+        <exec executable="lcov" dir="../build_codecoverage/lcov_results">
+            <arg line="--directory ../CMakeFiles/${ServiceName}.dir --capture --output-file app.info --gcov-tool /usr/bin/gcov-4.0" />
+        </exec>
+        <exec executable="genhtml" dir="../build_codecoverage/lcov_results">
+            <arg line="app.info" />
         </exec>
     </target>
     <target name="test_make_debug" unless="is.windows">
