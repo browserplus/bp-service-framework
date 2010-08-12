@@ -26,7 +26,7 @@
         <delete dir="../build_release" />
     </target>
     <target name="clean_vc08_codecoverage" if="is.windows">
-        <delete dir="../build" />
+        <!-- NO-OP -->
     </target>
     <target name="clean_vc08_debug" if="is.windows">
         <delete dir="../build" />
@@ -62,28 +62,7 @@
         </exec>
     </target>
     <target name="build_vc08_codecoverage" if="is.windows">
-        <mkdir dir="../build" />
-        <delete file="../build/x1.bat" />
-        <echo file="../build/x1.bat">@echo off
-call "C:\Program Files\Microsoft Visual Studio 9.0\vc\bin\vcvars32.bat"
-if not %WINTEMP%*==* set TEMP=%WINTEMP%
-if not %WINTMP%*==* set TMP=%WINTMP%
-cmake -G "Visual Studio 9 2008" ..\src
-        </echo>
-        <exec executable="cmd" dir="../build" failonerror="true">
-            <arg line="/C x1.bat" />
-        </exec>
-        <delete file="../build/x1.bat" />
-        <echo file="../build/x1.bat">@echo off
-call "C:\Program Files\Microsoft Visual Studio 9.0\vc\bin\vcvars32.bat"
-if not %WINTEMP%*==* set TEMP=%WINTEMP%
-if not %WINTMP%*==* set TMP=%WINTMP%
-devenv ${ServiceSolution}.sln /Build CodeCoverage /Project ALL_BUILD
-        </echo>
-        <exec executable="cmd" dir="../build" failonerror="true">
-            <arg line="/C x1.bat" />
-        </exec>
-        <delete file="../build/x1.bat" />
+        <!-- NO-OP -->
     </target>
     <target name="build_vc08_debug" if="is.windows">
         <mkdir dir="../build" />

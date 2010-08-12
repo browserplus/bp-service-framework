@@ -43,17 +43,7 @@
         </exec>
     </target>
     <target name="build_vc08_codecoverage" if="is.windows">
-        <delete file="x1.bat" />
-        <echo file="x1.bat">@echo off
-call "C:\Program Files\Microsoft Visual Studio 9.0\vc\bin\vcvars32.bat"
-if not %WINTEMP%*==* set TEMP=%WINTEMP%
-if not %WINTMP%*==* set TMP=%WINTMP%
-ruby .\build.rb
-        </echo>
-        <exec executable="cmd" failonerror="true">
-            <arg line="/C x1.bat" />
-        </exec>
-        <delete file="x1.bat" />
+        <!-- NO-OP -->
     </target>
     <target name="build_vc08_debug" if="is.windows">
         <delete file="x1.bat" />

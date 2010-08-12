@@ -61,7 +61,7 @@
         <delete file="runtests.xml" />
     </target>
     <target name="clean_vc08_codecoverage" if="is.windows">
-        <delete file="runtests.xml" />
+        <!-- NO-OP -->
     </target>
     <target name="clean_vc08_debug" if="is.windows">
         <delete file="runtests.xml" />
@@ -106,15 +106,7 @@
         </exec>
     </target>
     <target name="test_vc08_codecoverage" if="is.windows">
-        <delete file="x1.bat" />
-        <echo file="x1.bat">@echo off
-set BP_OUTPUT_DIR=build/${ServiceDirectory_vc08_codecoverage}
-ruby .\runtests.rb --runner cppunit_runner
-        </echo>
-        <exec executable="cmd" failonerror="true">
-            <arg line="/C x1.bat" />
-        </exec>
-        <delete file="x1.bat" />
+        <!-- NO-OP -->
     </target>
     <target name="test_vc08_debug" if="is.windows">
         <delete file="x1.bat" />
