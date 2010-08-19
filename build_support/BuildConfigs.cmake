@@ -79,7 +79,7 @@ IF (WIN32)
   SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${linkFlagsDebug}"
       CACHE STRING "BrowserPlus debug linker flags" FORCE)
   SET(CMAKE_EXE_LINKER_FLAGS_CODECOVERAGE "${CMAKE_EXE_LINKER_FLAGS_DEBUG}"
-      CACHE STRING "BrowserPlus debug linker flags" FORCE)
+      CACHE STRING "BrowserPlus codecoverage linker flags" FORCE)
   SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${linkFlagsRelease}"
       CACHE STRING "BrowserPlus release linker flags" FORCE)
   SET(CMAKE_SHARED_LINKER_FLAGS "${linkFlags}"
@@ -87,7 +87,7 @@ IF (WIN32)
   SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${linkFlagsDebug}"
       CACHE STRING "BrowserPlus shared debug linker flags" FORCE)
   SET(CMAKE_SHARED_LINKER_FLAGS_CODECOVERAGE "${CMAKE_SHARED_LINKER_FLAGS_DEBUG}"
-      CACHE STRING "BrowserPlus shared debug linker flags" FORCE)
+      CACHE STRING "BrowserPlus shared codecoverage linker flags" FORCE)
   SET(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${linkFlagsRelease}"
       CACHE STRING "BrowserPlus shared release linker flags" FORCE)
 
@@ -96,7 +96,7 @@ IF (WIN32)
   SET(CMAKE_MODULE_LINKER_FLAGS_DEBUG "${linkFlagsDebug}"
       CACHE STRING "BrowserPlus module debug linker flags" FORCE)
   SET(CMAKE_MODULE_LINKER_FLAGS_CODECOVERAGE "${CMAKE_MODULE_LINKER_FLAGS_DEBUG}"
-      CACHE STRING "BrowserPlus module debug linker flags" FORCE)
+      CACHE STRING "BrowserPlus module codecoverage linker flags" FORCE)
   SET(CMAKE_MODULE_LINKER_FLAGS_RELEASE "${linkFlagsRelease}"
       CACHE STRING "BrowserPlus module release linker flags" FORCE)
 ELSE ()
@@ -151,9 +151,12 @@ ELSE ()
   SET(CMAKE_CXX_FLAGS_DEBUG "-DDEBUG -g")
   SET(CMAKE_CXX_FLAGS_CODECOVERAGE "${CMAKE_CXX_FLAGS_DEBUG} -O0 -fprofile-arcs -ftest-coverage")
   SET(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -Os")
-  SET(CMAKE_MODULE_LINKER_FLAGS_RELEASE "-Wl,-x -lgcov")
-  SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "-Wl,-x -lgcov")
-  SET(CMAKE_SHARED_LINKER_FLAGS_RELEASE "-Wl,-x -lgcov")
+  SET(CMAKE_MODULE_LINKER_FLAGS_CODECOVERAGE "-lgcov")
+  SET(CMAKE_MODULE_LINKER_FLAGS_RELEASE "-Wl,-x")
+  SET(CMAKE_EXE_LINKER_FLAGS_CODECOVERAGE "-lgcov")
+  SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "-Wl,-x")
+  SET(CMAKE_SHARED_LINKER_FLAGS_CODECOVERAGE "-lgcov")
+  SET(CMAKE_SHARED_LINKER_FLAGS_RELEASE "-Wl,-x")
 ENDIF ()
 
 MACRO (BPAddCPPService)

@@ -1,4 +1,4 @@
-<project name="test_template" default="build_release">
+<project name="unittest_template" default="build_release">
     <property file="../build.properties" />
     <fail message="ServiceDirectory_make_codecoverage property not set">
         <condition>
@@ -52,22 +52,22 @@
         <os family="unix" />
     </condition>
     <target name="clean_make_codecoverage" unless="is.windows">
-        <delete file="runtests.xml" />
+        <delete file="unittest.xml" />
     </target>
     <target name="clean_make_debug" unless="is.windows">
-        <delete file="runtests.xml" />
+        <delete file="unittest.xml" />
     </target>
     <target name="clean_make_release" unless="is.windows">
-        <delete file="runtests.xml" />
+        <delete file="unittest.xml" />
     </target>
     <target name="clean_vc08_codecoverage" if="is.windows">
         <!-- NO-OP -->
     </target>
     <target name="clean_vc08_debug" if="is.windows">
-        <delete file="runtests.xml" />
+        <delete file="unittest.xml" />
     </target>
     <target name="clean_vc08_release" if="is.windows">
-        <delete file="runtests.xml" />
+        <delete file="unittest.xml" />
     </target>
     <target name="build_make_codecoverage" unless="is.windows">
         <!-- NO-OP -->
@@ -87,13 +87,13 @@
     <target name="build_vc08_release" if="is.windows">
         <!-- NO-OP -->
     </target>
-    <target name="test_make_codecoverage" unless="is.windows">
+    <target name="unittest_make_codecoverage" unless="is.windows">
         <exec executable="lcov" dir="../build_codecoverage">
             <arg line="--directory CMakeFiles/${ServiceName}.dir --zerocounters" />
         </exec>
         <exec executable="ruby" failonerror="true">
             <env key="BP_OUTPUT_DIR" value="build_codecoverage/${ServiceDirectory_make_codecoverage}" />
-            <arg line="./runtests.rb --runner cppunit_runner" />
+            <arg line="./unittest.rb --runner cppunit_runner" />
         </exec>
         <delete dir="../build_codecoverage/lcov_results" />
         <mkdir dir="../build_codecoverage/lcov_results" />
@@ -108,37 +108,37 @@
             <arg line="--output-directory lcov-report lcov.info" />
         </exec>
     </target>
-    <target name="test_make_debug" unless="is.windows">
+    <target name="unittest_make_debug" unless="is.windows">
         <exec executable="ruby" failonerror="true">
             <env key="BP_OUTPUT_DIR" value="build_debug/${ServiceDirectory_make_debug}" />
-            <arg line="./runtests.rb --runner cppunit_runner" />
+            <arg line="./unittest.rb --runner cppunit_runner" />
         </exec>
     </target>
-    <target name="test_make_release" unless="is.windows">
+    <target name="unittest_make_release" unless="is.windows">
         <exec executable="ruby" failonerror="true">
             <env key="BP_OUTPUT_DIR" value="build_release/${ServiceDirectory_make_release}" />
-            <arg line="./runtests.rb --runner cppunit_runner" />
+            <arg line="./unittest.rb --runner cppunit_runner" />
         </exec>
     </target>
-    <target name="test_vc08_codecoverage" if="is.windows">
+    <target name="unittest_vc08_codecoverage" if="is.windows">
         <!-- NO-OP -->
     </target>
-    <target name="test_vc08_debug" if="is.windows">
+    <target name="unittest_vc08_debug" if="is.windows">
         <delete file="x1.bat" />
         <echo file="x1.bat">@echo off
 set BP_OUTPUT_DIR=build/${ServiceDirectory_vc08_debug}
-ruby .\runtests.rb --runner cppunit_runner
+ruby .\unittest.rb --runner cppunit_runner
         </echo>
         <exec executable="cmd" failonerror="true">
             <arg line="/C x1.bat" />
         </exec>
         <delete file="x1.bat" />
     </target>
-    <target name="test_vc08_release" if="is.windows">
+    <target name="unittest_vc08_release" if="is.windows">
         <delete file="x1.bat" />
         <echo file="x1.bat">@echo off
 set BP_OUTPUT_DIR=build/${ServiceDirectory_vc08_release}
-ruby .\runtests.rb --runner cppunit_runner
+ruby .\unittest.rb --runner cppunit_runner
         </echo>
         <exec executable="cmd" failonerror="true">
             <arg line="/C x1.bat" />
@@ -151,7 +151,7 @@ ruby .\runtests.rb --runner cppunit_runner
     <target name="build_codecoverage" depends="build_make_codecoverage,build_vc08_codecoverage" />
     <target name="build_debug" depends="build_make_debug,build_vc08_debug" />
     <target name="build_release" depends="build_make_release,build_vc08_release" />
-    <target name="test_codecoverage" depends="test_make_codecoverage,test_vc08_codecoverage" />
-    <target name="test_debug" depends="test_make_debug,test_vc08_debug" />
-    <target name="test_release" depends="test_make_release,test_vc08_release" />
+    <target name="unittest_codecoverage" depends="unittest_make_codecoverage,unittest_vc08_codecoverage" />
+    <target name="unittest_debug" depends="unittest_make_debug,unittest_vc08_debug" />
+    <target name="unittest_release" depends="unittest_make_release,unittest_vc08_release" />
 </project>
