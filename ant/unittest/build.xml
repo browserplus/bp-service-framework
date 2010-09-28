@@ -145,22 +145,13 @@ ruby .\unittest.rb --runner cppunit_runner
         </exec>
         <delete file="x1.bat" />
     </target>
-<!--
     <target name="clean_codecoverage" depends="clean_make_codecoverage,clean_vc08_codecoverage" />
--->
-    <target name="clean_codecoverage" depends="clean_make_codecoverage,clean_vc08_debug" />
     <target name="clean_debug" depends="clean_make_debug,clean_vc08_debug" />
     <target name="clean_release" depends="clean_make_release,clean_vc08_release" />
-<!--
     <target name="build_codecoverage" depends="build_make_codecoverage,build_vc08_codecoverage" />
--->
-    <target name="build_codecoverage" depends="build_make_codecoverage,build_vc08_debug" />
     <target name="build_debug" depends="build_make_debug,build_vc08_debug" />
     <target name="build_release" depends="build_make_release,build_vc08_release" />
-<!--
     <target name="unittest_codecoverage" depends="unittest_make_codecoverage,unittest_vc08_codecoverage" />
--->
-    <target name="unittest_codecoverage" depends="unittest_make_codecoverage,unittest_vc08_debug" />
     <target name="unittest_debug" depends="unittest_make_debug,unittest_vc08_debug" />
     <target name="unittest_release" depends="unittest_make_release,unittest_vc08_release" />
 </project>
