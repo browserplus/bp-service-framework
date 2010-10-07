@@ -53,21 +53,26 @@
     </condition>
     <target name="clean_make_codecoverage" unless="is.windows">
         <delete file="unittest.xml" />
+        <delete dir="providerDir" />
     </target>
     <target name="clean_make_debug" unless="is.windows">
         <delete file="unittest.xml" />
+        <delete dir="providerDir" />
     </target>
     <target name="clean_make_release" unless="is.windows">
         <delete file="unittest.xml" />
+        <delete dir="providerDir" />
     </target>
     <target name="clean_vc08_codecoverage" if="is.windows">
         <!-- NO-OP -->
     </target>
     <target name="clean_vc08_debug" if="is.windows">
         <delete file="unittest.xml" />
+        <delete dir="providerDir" />
     </target>
     <target name="clean_vc08_release" if="is.windows">
         <delete file="unittest.xml" />
+        <delete dir="providerDir" />
     </target>
     <target name="build_make_codecoverage" unless="is.windows">
         <!-- NO-OP -->
