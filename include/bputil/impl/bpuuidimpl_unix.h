@@ -39,7 +39,7 @@
 #include <uuid/uuid.h>
 
 
-namespace bp {
+namespace bplus {
 namespace uuid {
 
 
@@ -57,7 +57,7 @@ bool generate( std::string& sUuid )
 
    
 } // uuid
-} // bp
+} // bplus
 
 
 #endif // BPUUIDIMPLUNIX_H_
