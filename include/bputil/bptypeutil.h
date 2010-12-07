@@ -13,26 +13,33 @@
  * The Original Code is BrowserPlus (tm).
  * 
  * The Initial Developer of the Original Code is Yahoo!.
- * Portions created by Yahoo! are Copyright (C) 2006-2008 Yahoo!.
- * All Rights Reserved.
+ * Portions created by Yahoo! are Copyright (c) 2010 Yahoo! Inc.
+ * All rights reserved.
  * 
  * Contributor(s): 
- * ***** END LICENSE BLOCK ***** */
+ * ***** END LICENSE BLOCK *****
+ */
 
 /**
  * bptypeutil.h -- c++ utilities to make building hierarchies of BPElements
  *                 eaiser.  A tool that may be consumed in source form
- *                 by a corelet author to simplify mapping into and out of
- *                 introspectable corelet API types.
+ *                 by a service author to simplify mapping into and out of
+ *                 introspectable service API types.
  */
 
 #ifndef BPTYPEUTIL_H_
 #define BPTYPEUTIL_H_
 
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 #include "bpserviceapi/bptypes.h"
+#include "bputil/bppathstring.h"
+
+
+#define BP_DISALLOW_COPY(_TypeName_)                \
+    _TypeName_(const _TypeName_ &);                 \
+    _TypeName_ & operator= (const _TypeName_ & other);
 
 
 namespace bplus {
@@ -45,12 +52,13 @@ namespace bplus {
     class ConversionException
     {
       public:
-        ConversionException(const std::string& desc) : m_desc(desc) { }
-        std::string m_desc;
+		  ConversionException(const std::string& desc) : m_desc(desc) {}
+		  std::string m_desc;
     };
+    
 
     /**
-     * bpu::Object is the common base class for all BPElements
+     * bplus::Object is the common base class for all BPElements
      */
     class Object
     {
@@ -68,9 +76,6 @@ namespace bplus {
 
         /** \overload (don't check type) */
         bool has(const char * path) const;
-
-        /**  attach a supplied node at a specified path, creating as we go */  
-        void attachNode(const char * path, Object * node);
 
         /**
          * Get a descendant node
@@ -103,7 +108,11 @@ namespace bplus {
          */
         virtual operator bool() const; // throw(ConversionException)
         virtual operator std::string() const; // throw(ConversionException)
-        virtual operator long long() const; // throw(ConversionException)
+        
+        //virtual operator bp::file::Path() const; // throw(ConversionException)
+        virtual operator tPathString() const; // throw(ConversionException)
+        
+		virtual operator long long() const; // throw(ConversionException)
         virtual operator double() const; // throw(ConversionException)
         virtual operator std::map<std::string, const Object *>() const;
             // throw(ConversionException)
@@ -151,27 +160,43 @@ namespace bplus {
         String(const String &);
         String & operator= (const String & other);
         virtual ~String();
-        const BPString value() const;
         // note: the returned pointer is to internal memory, and is
         // only valid for the lifetime of the object, or the invocation
+        const BPString value() const;
         operator std::string() const; // throw(ConversionException)
         virtual Object * clone() const;
     protected:
         std::string str;
     };
-    
-    // Path represents a pathname in URI form.
-    class Path : public String
+
+    // Path represents a pathname in native form.
+    class Path : public Object
     {
     public:
-        Path(const char * str);
-        Path(const char * str, unsigned int);
-        Path(const std::string & str);
-        Path(const Path &);
-        Path & operator= (const Path &);
-
+//      Path(const bp::file::Path & path);
+        Path(const tPathString& path);
+        Path(const Path & other);
+        Path & operator= (const Path & other);
+        // note: the returned pointer is to internal memory, and is
+        // only valid for the lifetime of the object, or the invocation
+        const BPPath value() const;
         virtual ~Path();
+//      operator bp::file::Path() const; // throw(ConversionException)
+        operator tPathString() const; // throw(ConversionException)
         virtual Object * clone() const;
+    protected:
+//      bp::file::tString m_path;
+        tPathString m_path;
+    };
+
+    class WritablePath : public Path
+    {
+      public:
+//      WritablePath(const bp::file::Path & path);
+        WritablePath(const tPathString& path);
+        WritablePath(const WritablePath & other);
+        WritablePath & operator= (const WritablePath & other);
+        virtual Object * clone() const;        
     };
 
     class Integer : public Object
@@ -259,39 +284,39 @@ namespace bplus {
         
         /**
          * Get a boolean from the map.
-         * Returns true iff boolean val with key name present.
+         * Returns true iff boolean val with path name present.
          */
-        bool getBool(const std::string& key, bool& bValue) const;
+        bool getBool(const std::string& path, bool& bValue) const;
 
         /**
          * Get an integer from the map.
-         * Returns true iff integer val with key name present.
+         * Returns true iff integer val with path name present.
          */
-        bool getInteger(const std::string& key, int& nValue) const;
+        bool getInteger(const std::string& path, int& nValue) const;
 
         /**
          * Get a List from the map.
-         * Returns true iff integer val with key name present.
+         * Returns true iff integer val with path name present.
          */
-        bool getList(const std::string& key, const List*& list) const;
+        bool getList(const std::string& path, const List*& list) const;
 
         /**
          * Get a native long long integer from the map.
-         * Returns true iff integer val with key name present.
+         * Returns true iff integer val with path name present.
          */
-        bool getLong(const std::string& key, long long int& lValue) const;
+        bool getLong(const std::string& path, long long int& lValue) const;
 
         /**
          * Get a Map from the map.
-         * Returns true iff integer val with key name present.
+         * Returns true iff integer val with path name present.
          */
-        bool getMap(const std::string& key, const Map*& pMap) const;
+        bool getMap(const std::string& path, const Map*& pMap) const;
 
         /**
          * Get a string from the map.
-         * Returns true iff string val with key name present.
+         * Returns true iff string val with path name present.
          */
-        bool getString(const std::string& key, std::string& sValue) const;
+        bool getString(const std::string& path, std::string& sValue) const;
 
         /** A mechanism to traverse all of the keys present */
         class Iterator {
@@ -303,7 +328,7 @@ namespace bplus {
             const Map * m_m;
         };
 
-        virtual operator std::map<std::string, const bplus::Object *>() const;
+        virtual operator std::map<std::string, const Object *>() const;
 
         virtual const Object & operator[](const char * key) const;
 
@@ -311,7 +336,7 @@ namespace bplus {
     private:
         std::vector<Object *> values;
         std::vector<std::string> keys;
-        friend class bplus::Object;
+        friend class Object;
     };
     
     /* Create a BP object from a Map.
@@ -319,10 +344,11 @@ namespace bplus {
      * a known BP object.
      */
     Object * createBPObject(const Map * map);
-};
+    
+} // namespace bplus
 
 
-//////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Get the implementations.
 #include "impl/bptypeutilimpl.h"
 

@@ -13,11 +13,12 @@
  * The Original Code is BrowserPlus (tm).
  * 
  * The Initial Developer of the Original Code is Yahoo!.
- * Portions created by Yahoo! are Copyright (C) 2006-2008 Yahoo!.
- * All Rights Reserved.
+ * Portions created by Yahoo! are Copyright (c) 2010 Yahoo! Inc.
+ * All rights reserved.
  * 
  * Contributor(s): 
- * ***** END LICENSE BLOCK ***** */
+ * ***** END LICENSE BLOCK *****
+ */
 
 /*
  * Written by Lloyd Hilaiel, on or around Fri May 18 17:06:54 MDT 2007 
@@ -48,11 +49,12 @@ typedef enum {
     BPTMap,     /*!< map (hash) type. */
     BPTList,    /*!< list (array) type. */
     BPTCallBack,/*!< callback type. */
-    BPTPath,    /*!< pathname type - represented as a string however
-                     paths are sensitive and are handled differently
-                     than strings */
-    BPTAny      /*!< When specified in an argument description, denotes
+    BPTNativePath, /*!< pathname type - represented as a native path: UTF8
+                     on unix and UTF16 on windows.  */
+    BPTAny,     /*!< When specified in an argument description, denotes
                      that any data type is allowable. */
+    BPTWritableNativePath /*!< Same as BPTNativePath, but services may (over)write
+                               the contents of the file specified */   
 } BPType;
 
 /* definition of basic types */
@@ -90,7 +92,11 @@ typedef struct {
 } BPMap;
 
 /** pathnames are UTF8 */
-typedef char * BPPath;
+#if defined(WIN32) || defined(WINDOWS) || defined(_WINDOWS)
+  typedef wchar_t * BPPath;
+#else
+  typedef char * BPPath;
+#endif
 
 /** The uber structure capable of representing any element */
 typedef struct BPElement_t {

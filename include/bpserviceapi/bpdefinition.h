@@ -13,11 +13,12 @@
  * The Original Code is BrowserPlus (tm).
  * 
  * The Initial Developer of the Original Code is Yahoo!.
- * Portions created by Yahoo! are Copyright (C) 2006-2008 Yahoo!.
- * All Rights Reserved.
+ * Portions created by Yahoo! are Copyright (c) 2010 Yahoo! Inc.
+ * All rights reserved.
  * 
  * Contributor(s): 
- * ***** END LICENSE BLOCK ***** */
+ * ***** END LICENSE BLOCK *****
+ */
 
 /**
  * Written by Lloyd Hilaiel, on or around Fri May 18 17:06:54 MDT 2007 
@@ -63,9 +64,9 @@ typedef struct {
 } BPFunctionDefinition;
 
 /** The definition of a service */
-typedef struct BPCoreletDefinition_t {
+typedef struct BPServiceDefinition_t {
     /** The name of the service */
-    BPString coreletName;
+    BPString serviceName;
     /** The major version of the service */
     unsigned int majorVersion;
     /** The minor version of the service */
@@ -78,7 +79,7 @@ typedef struct BPCoreletDefinition_t {
     unsigned int numFunctions;
     /** An array of function definitions */
     BPFunctionDefinition * functions;
-} BPCoreletDefinition;
+} BPServiceDefinition;
 
 #ifdef __cplusplus
 };

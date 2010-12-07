@@ -13,11 +13,12 @@
  * The Original Code is BrowserPlus (tm).
  * 
  * The Initial Developer of the Original Code is Yahoo!.
- * Portions created by Yahoo! are Copyright (C) 2006-2008 Yahoo!.
- * All Rights Reserved.
+ * Portions created by Yahoo! are Copyright (c) 2010 Yahoo! Inc.
+ * All rights reserved.
  * 
  * Contributor(s): 
- * ***** END LICENSE BLOCK ***** */
+ * ***** END LICENSE BLOCK *****
+ */
 
 /**
  *  bptypeutilimpl.h
@@ -27,103 +28,21 @@
  *  Note: This file is included by bptypeutil.h.
  *        It is not intended for direct inclusion by client code.
  */
-#ifndef BPTYPEUTILIMPL_H_
-#define BPTYPEUTILIMPL_H_
 
 #include <assert.h>
+#include "bpstrutil.h"
+
 
 #ifdef WIN32
 #pragma warning(disable:4100)
 #endif
 
 
-#ifdef WIN32
-#define PATH_SEPARATOR "\\"
-#else 
-#define PATH_SEPARATOR "/"
-#endif
-
-#define FILE_URL_PREFIX "file://"
+namespace bplus {
 
 
-inline std::vector<std::string> 
-split(const std::string& str, 
-      const std::string& delim)
-{
-    std::vector<std::string> vsRet;
-    
-    unsigned int offset = 0;
-    unsigned int delimIndex = 0;
-    delimIndex = str.find(delim, offset);
-    while (delimIndex != std::string::npos) {
-        vsRet.push_back(str.substr(offset, delimIndex - offset));
-        offset += delimIndex - offset + delim.length();
-        delimIndex = str.find(delim, offset);
-    }
-    vsRet.push_back(str.substr(offset));
-
-    return vsRet;
-}
-
-inline std::string 
-urlEncode(const std::string& s)
-{
-    std::string out;
-    
-    char hex[4];
-
-    static const char noencode[] = "!'()*-._";
-    static const char hexvals[] = {
-        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 
-        'A', 'B', 'C', 'D', 'E', 'F'
-    };
-    
-    for (unsigned int i = 0; i < s.length(); i++) {
-        if (isalnum((unsigned char)s[i]) || strchr(noencode, s[i]) != NULL) {
-            out.append(&s[i], 1);
-        } else {
-            hex[0] = '%';
-            hex[1] = hexvals[(s[i] >> 4) & 0x0F];
-            hex[2] = hexvals[s[i] & 0xF];
-            hex[3] = 0;
-            out.append(hex, strlen(hex));
-        }
-    }
-    return out;
-}
-
-inline std::string 
-urlFromPath(const std::string& s)
-{
-    // is this already a url?
-    if (s.substr(0, strlen(FILE_URL_PREFIX)) == FILE_URL_PREFIX) {
-        return s;
-    }
-    
-    std::string delim(PATH_SEPARATOR);
-    std::vector<std::string> edges = split(s, delim);
-    
-    std::string rval(FILE_URL_PREFIX);
-    for (unsigned int i = 0; i < edges.size(); i++) {
-#ifdef WIN32
-        // leave DOS volumes alone
-        if (i == 0 && edges[i].length() == 2 && edges[i][1] == ':') {
-            rval.append("/");
-            rval.append(edges[i]);
-            continue;
-        }
-#endif
-        if (edges[i].length() > 0) {
-            rval.append("/");
-            rval.append(urlEncode(edges[i]));
-        }
-    }
-    return rval;
-}
-
-
-inline const char *
-bplus::typeAsString(BPType t)
+const char *
+typeAsString(BPType t)
 {
     switch (t) {
         case BPTNull: return "null";
@@ -134,56 +53,54 @@ bplus::typeAsString(BPType t)
         case BPTMap: return "map";
         case BPTList: return "list";
         case BPTCallBack: return "callback";
-        case BPTPath: return "path";
+        case BPTNativePath: return "path";
+        case BPTWritableNativePath: return "writablePath";
         case BPTAny: return "any";
     }
     return "unknown";
 }
 
 
-inline bplus::Object::Object(BPType t)
+inline
+Object::Object(BPType t)
 {
     e.type = t;
 }
 
-inline bplus::Object::~Object()
+inline
+Object::~Object()
 {
 }
 
+
 inline BPType
-bplus::Object::type() const
+Object::type() const
 {
     return e.type;
 }
 
 inline bool
-bplus::Object::has(const char * path, BPType type) const
+Object::has(const char * path, BPType type) const
 {
-    const bplus::Object * obj = get(path);
+    const Object * obj = get(path);
     return ((obj != NULL) && obj->type() == type);
 }
 
 inline bool
-bplus::Object::has(const char * path) const
+Object::has(const char * path) const
 {
     return (get(path) != NULL);
 }
 
-inline void
-bplus::Object::attachNode(const char * path,
-                       Object * node)
-{
-    // XXX
-}
-
-inline const bplus::Object *
-bplus::Object::get(const char * path) const
+inline const Object *
+Object::get(const char * path) const
 {
     const Object * obj = NULL;
 
     if (path == NULL) return obj;
     
-    std::vector<std::string> paths = split(std::string(path), "/");
+    std::vector<std::string> paths =
+        strutil::split(std::string(path), "/");
 
     obj = this;
 
@@ -198,7 +115,7 @@ bplus::Object::get(const char * path) const
         {
             if (!paths[i].compare(oldobj->e.value.mapVal.elements[j].key))
             {
-                obj = static_cast<const bplus::Map *>(oldobj)->values[j];
+                obj = static_cast<const Map *>(oldobj)->values[j];
                 break;
             }
         }
@@ -209,13 +126,13 @@ bplus::Object::get(const char * path) const
 }
 
 inline const BPElement *
-bplus::Object::elemPtr() const
+Object::elemPtr() const
 {
     return &e;
 }
 
-inline bplus::Object *
-bplus::Object::build(const BPElement * elem)
+inline Object *
+Object::build(const BPElement * elem)
 {
     Object * obj = NULL;
 
@@ -224,29 +141,37 @@ bplus::Object::build(const BPElement * elem)
         switch (elem->type)
         {
             case BPTNull:
-                obj = new bplus::Null;
+                obj = new Null;
                 break;
             case BPTBoolean:
-                obj = new bplus::Bool(elem->value.booleanVal);
+                obj = new Bool(elem->value.booleanVal);
                 break;
             case BPTInteger:
-                obj = new bplus::Integer(elem->value.integerVal);
+                obj = new Integer(elem->value.integerVal);
                 break;
             case BPTCallBack:
-                obj = new bplus::CallBack(elem->value.callbackVal);
+                obj = new CallBack(elem->value.callbackVal);
                 break;
             case BPTDouble:
-                obj = new bplus::Double(elem->value.doubleVal);
+                obj = new Double(elem->value.doubleVal);
                 break;
             case BPTString:
-                obj = new bplus::String(elem->value.stringVal);
+                obj = new String(elem->value.stringVal);
                 break;
-            case BPTPath:
-                obj = new bplus::Path(elem->value.pathVal);
+            case BPTNativePath: 
+            {
+//              obj = new Path(file::Path(elem->value.pathVal));
+                obj = new Path(tPathString(elem->value.pathVal));
                 break;
+            }
+            case BPTWritableNativePath: 
+            {
+                obj = new WritablePath(tPathString(elem->value.pathVal));
+                break;
+            }
             case BPTMap:
             {
-                bplus::Map * m = new bplus::Map;
+                Map * m = new Map;
                 
                 for (unsigned int i = 0; i < elem->value.mapVal.size; i++)
                 {
@@ -259,7 +184,7 @@ bplus::Object::build(const BPElement * elem)
             }
             case BPTList:
             {
-                bplus::List * l = new bplus::List;
+                List * l = new List;
                 
                 for (unsigned int i = 0; i < elem->value.listVal.size; i++)
                 {
@@ -280,7 +205,7 @@ bplus::Object::build(const BPElement * elem)
 }
 
 inline const char *
-bplus::Object::getStringNodeValue( const char * cszPath )
+Object::getStringNodeValue( const char * cszPath )
 {
     const Object* pNode = get(cszPath);
     if (!pNode || pNode->type() != BPTString)
@@ -288,209 +213,277 @@ bplus::Object::getStringNodeValue( const char * cszPath )
         return NULL;
     }
     
-    return static_cast<const bplus::String *>(pNode)->value();
+    return static_cast<const String *>(pNode)->value();
 }
 
-inline bplus::Object::operator bool() const 
+inline 
+Object::operator bool() const 
 {
     throw ConversionException("cannot convert to bool");
 }
 
-inline bplus::Object::operator std::string() const 
+inline 
+Object::operator std::string() const 
 {
     throw ConversionException("cannot convert to string");
 }
 
-inline bplus::Object::operator long long() const 
+inline
+//Object::operator file::Path() const 
+Object::operator tPathString() const 
+{
+    throw ConversionException("cannot convert to path");
+}
+
+inline
+Object::operator long long() const 
 {
     throw ConversionException("cannot convert to long");
 }
 
-inline bplus::Object::operator double() const 
+inline 
+Object::operator double() const 
 {
     throw ConversionException("cannot convert to double");
 }
 
-inline bplus::Object::operator std::map<std::string, const bplus::Object *>() const
+inline 
+Object::operator std::map<std::string, const Object *>() const
 {
     throw ConversionException("cannot convert to map<string, Object*>");
 }
     
-
-inline bplus::Object::operator std::vector<const bplus::Object *>() const
+inline 
+Object::operator std::vector<const Object *>() const
 {
     throw ConversionException("cannot convert to vector<Object*>");
 }
 
-inline const bplus::Object &
-bplus::Object::operator[](const char * key) const
+inline const Object &
+Object::operator[](const char *) const
 {
     throw ConversionException("cannot apply operator[const char*]");
 }
 
-inline const bplus::Object &
-bplus::Object::operator[](unsigned int index) const
+inline const Object &
+Object::operator[](unsigned int) const
 {
     throw ConversionException("cannot apply operator[int]");
 }
 
-inline bplus::Null::Null()
-    : bplus::Object(BPTNull) 
+inline 
+Null::Null()
+    : Object(BPTNull) 
 {
 }
 
-inline bplus::Null::~Null()
+inline 
+Null::~Null()
 {
 }
 
-inline bplus::Object * 
-bplus::Null::clone() const
+inline Object * 
+Null::clone() const
 {
-    return new bplus::Null();
+    return new Null();
 }
-    
-inline bplus::Bool::Bool(bool val)
-    : bplus::Object(BPTBoolean) 
+
+inline 
+Bool::Bool(bool val)
+    : Object(BPTBoolean) 
 {
     e.value.booleanVal = val;
 }
 
-inline bplus::Bool::~Bool()
+inline 
+Bool::~Bool()
 {
 }
 
 inline BPBool
-bplus::Bool::value() const
+Bool::value() const
 {
     return e.value.booleanVal;
 }
 
-inline bplus::Object * 
-bplus::Bool::clone() const
+inline Object * 
+Bool::clone() const
 {
-    return new bplus::Bool(value());
+    return new Bool(value());
 }
 
-inline bplus::Bool::operator bool() const 
+inline 
+Bool::operator bool() const 
 {
     return value();
 }
 
-inline bplus::String::String(const char * str)
-    : bplus::Object(BPTString) 
+inline 
+String::String(const char * str)
+    : Object(BPTString) 
 {
     if (!str) str = "";
     this->str.append(str);
     e.value.stringVal = (char *) this->str.c_str();
 }
 
-inline bplus::String::String(const char * str, unsigned int len)
-    : bplus::Object(BPTString) 
+inline 
+String::String(const char * str, unsigned int len)
+    : Object(BPTString) 
 {
     this->str.append(str, len);
     e.value.stringVal = (char *) this->str.c_str();
 }
 
-inline bplus::String::String(const std::string & str)
-    : bplus::Object(BPTString) 
+inline 
+String::String(const std::string & str)
+    : Object(BPTString) 
 {
     this->str = str;
     e.value.stringVal = (char *) this->str.c_str();
 }
 
-inline bplus::String::String(const String & other)
-    : bplus::Object(BPTString)
+inline 
+String::String(const String & other)
+    : Object(BPTString)
 {
     str = other.str;
     e.value.stringVal = (char *) this->str.c_str();
 }
 
-inline bplus::String &
-bplus::String::operator= (const String & other)
+inline String &
+String::operator= (const String & other)
 {
     str = other.str;
     e.value.stringVal = (char *) this->str.c_str();
     return *this;
 }
 
-inline bplus::String::~String()
+inline 
+String::~String()
 {
 }
 
 inline const BPString
-bplus::String::value() const
+String::value() const
 {
     return e.value.stringVal;
 }
 
-inline bplus::Object * 
-bplus::String::clone() const
+inline Object * 
+String::clone() const
 {
     return new String(*this);
 }
 
-inline bplus::String::operator std::string() const 
+inline 
+String::operator std::string() const 
 {
     return std::string(value());
 }
 
-inline bplus::Path::Path(const char * str)
-    : bplus::String(str) 
+inline 
+//WritablePath::WritablePath(const file::Path & path)
+WritablePath::WritablePath(const tPathString& path)
+    : Path(path)
 {
-    e.type = BPTPath;
-    this->str = urlFromPath(this->str);
-    e.value.pathVal = (char *)this->str.c_str();
+    e.type = BPTWritableNativePath;
 }
 
-inline bplus::Path::Path(const char * str, unsigned int len)
-    : bplus::String(str, len)
+inline 
+WritablePath::WritablePath(const WritablePath & other)
+    :  Path(other)
 {
-    e.type = BPTPath;
-    this->str.clear();
-    this->str.append(str, len);
-    this->str = urlFromPath(this->str);
-    e.value.pathVal = (char *)this->str.c_str();
+    e.type = BPTWritableNativePath;
 }
 
-inline bplus::Path::Path(const std::string & str)
-    : bplus::String(str) 
+inline WritablePath &
+WritablePath::operator= (const WritablePath & other)
 {
-    e.type = BPTPath;
-    this->str = urlFromPath(this->str);
-    e.value.pathVal = (char *)this->str.c_str();
-}
-
-inline bplus::Path::Path(const Path & other)
-    : bplus::String(other.str)
-{
-    e.type = BPTPath;
-}
-
-inline bplus::Path &
-bplus::Path::operator= (const Path & other)
-{
-    str = other.str;
-    e.value.pathVal = (char *) str.c_str();
+    m_path = other.m_path;
+    e.value.pathVal = (BPPath) m_path.c_str();
     return *this;
 }
 
-inline bplus::Path::~Path()
+inline Object * 
+WritablePath::clone() const
+{
+    return new WritablePath(*this);
+}
+
+/*
+inline 
+Path::Path(const file::Path & path)
+    : Object(BPTNativePath), m_path(path.external_file_string())
+{
+    e.value.pathVal = (BPPath) m_path.c_str();
+}
+*/
+inline 
+Path::Path(const tPathString& path)
+   : Object(BPTNativePath), m_path(path)
+{
+    e.value.pathVal = (BPPath) m_path.c_str();
+}
+
+inline 
+Path::Path(const Path & other)
+    :  Object(BPTNativePath), m_path(other.m_path)
+{
+    e.type = BPTNativePath;
+    e.value.pathVal = (BPPath) m_path.c_str();
+}
+
+inline const BPPath
+Path::value() const
+{
+    return e.value.pathVal;
+}
+
+inline Path &
+Path::operator= (const Path & other)
+{
+    m_path = other.m_path;
+    e.value.pathVal = (BPPath) m_path.c_str();
+    return *this;
+}
+
+/*
+inline 
+Path::operator file::Path() const 
+{
+	return file::Path(m_path);
+}
+*/
+inline 
+Path::operator tPathString() const 
+{
+    return m_path;
+}
+
+
+inline 
+Path::~Path()
 {
 }
 
-inline bplus::Object * 
-bplus::Path::clone() const
+inline Object * 
+Path::clone() const
 {
-    return new Path(this->str);
+// 2009apr29 dg
+//  return new Path(this->str);
+    return new Path(*this);
 }
 
-inline bplus::Map::Map() : bplus::Object(BPTMap) 
+inline 
+Map::Map() : Object(BPTMap) 
 {
     e.value.mapVal.size = 0;
     e.value.mapVal.elements = NULL;
 }
 
-inline bplus::Map::Map(const Map & o) : bplus::Object(BPTMap) 
+inline 
+Map::Map(const Map & o) : Object(BPTMap) 
 {
     e.value.mapVal.size = 0;
     e.value.mapVal.elements = NULL;
@@ -502,8 +495,8 @@ inline bplus::Map::Map(const Map & o) : bplus::Object(BPTMap)
     }
 }
 
-inline bplus::Map &
-bplus::Map::operator= (const bplus::Map & o)
+inline Map &
+Map::operator= (const Map & o)
 {
     for (unsigned int i = 0; i < values.size(); i++) delete values[i];
     if (e.value.mapVal.elements != NULL) free(e.value.mapVal.elements);
@@ -520,13 +513,14 @@ bplus::Map::operator= (const bplus::Map & o)
     return *this;
 }
 
-inline bplus::Object *
-bplus::Map::clone() const
+inline Object *
+Map::clone() const
 {
     return new Map(*this);
 }
 
-inline bplus::Map::~Map()
+inline 
+Map::~Map()
 {
     for (unsigned int i = 0; i < values.size(); i++)
     {
@@ -541,14 +535,14 @@ inline bplus::Map::~Map()
 
 
 inline unsigned int
-bplus::Map::size() const
+Map::size() const
 {
     return e.value.mapVal.size;
 }
 
 
-inline const bplus::Object *
-bplus::Map::value(const char * key) const
+inline const Object *
+Map::value(const char * key) const
 {
 	if (key == NULL) return NULL;
     unsigned int i;
@@ -560,10 +554,10 @@ bplus::Map::value(const char * key) const
     return NULL;
 }
 
-inline const bplus::Object &
-bplus::Map::operator[](const char * key) const
+inline const Object &
+Map::operator[](const char * key) const
 {
-    const bplus::Object * v = value(key);
+    const Object * v = value(key);
     if (v == NULL) {
         throw bplus::ConversionException("no such element in map");
     }
@@ -571,17 +565,18 @@ bplus::Map::operator[](const char * key) const
 }
 
 inline bool
-bplus::Map::kill(const char * key)
+Map::kill(const char * key)
 {
     bool rval = false;
 	if (key == NULL) return rval;
     std::vector<std::string>::iterator it;
-    std::vector<bplus::Object*>::iterator vit;
+    std::vector<Object*>::iterator vit;
     for (it = keys.begin(), vit = values.begin();
          it != keys.end() && vit != values.end();
          ++it, ++vit) {
         if (!strcmp(key, (*it).c_str())) {
             keys.erase(it);
+            delete *vit;
             values.erase(vit);
             e.value.mapVal.size--;
             rval = true;
@@ -605,8 +600,9 @@ bplus::Map::kill(const char * key)
 }
 
 inline void
-bplus::Map::add(const char * key, bplus::Object * value)
+Map::add(const char * key, Object * value)
 {
+//  BPASSERT(value != NULL);
     assert(value != NULL);
     kill(key);
     unsigned int ix = e.value.mapVal.size;
@@ -626,16 +622,16 @@ bplus::Map::add(const char * key, bplus::Object * value)
 }
 
 inline void
-bplus::Map::add(const std::string& key, bplus::Object* value)
+Map::add(const std::string& key, Object* value)
 {
     add(key.c_str(), value);
 }
 
 inline bool
-bplus::Map::getBool(const std::string& sKey, bool& bValue) const
+Map::getBool(const std::string& sPath, bool& bValue) const
 {
-    if (has(sKey.c_str(), BPTBoolean)) {
-        bValue = dynamic_cast<const bplus::Bool*>(get(sKey.c_str()))->value();
+    if (has(sPath.c_str(), BPTBoolean)) {
+        bValue = dynamic_cast<const Bool*>(get(sPath.c_str()))->value();
         return true;
     }
 
@@ -643,10 +639,10 @@ bplus::Map::getBool(const std::string& sKey, bool& bValue) const
 }
 
 inline bool
-bplus::Map::getInteger(const std::string& sKey, int& nValue) const
+Map::getInteger(const std::string& sPath, int& nValue) const
 {
-    if (has(sKey.c_str(), BPTInteger)) {
-        long long int lVal = dynamic_cast<const Integer*>(get(sKey.c_str()))->value();
+    if (has(sPath.c_str(), BPTInteger)) {
+        long long int lVal = dynamic_cast<const Integer*>(get(sPath.c_str()))->value();
         nValue = static_cast<int>(lVal);
         return true;
     }
@@ -655,10 +651,10 @@ bplus::Map::getInteger(const std::string& sKey, int& nValue) const
 }
    
 inline bool
-bplus::Map::getList(const std::string& sKey, const bplus::List*& pList) const
+Map::getList(const std::string& sPath, const List*& pList) const
 {
-    if (has(sKey.c_str(), BPTList)) {
-        pList = dynamic_cast<const bplus::List*>(get(sKey.c_str()));
+    if (has(sPath.c_str(), BPTList)) {
+        pList = dynamic_cast<const List*>(get(sPath.c_str()));
         return true;
     }
 
@@ -666,10 +662,10 @@ bplus::Map::getList(const std::string& sKey, const bplus::List*& pList) const
 }
 
 inline bool
-bplus::Map::getLong(const std::string& sKey, long long int& lValue) const
+Map::getLong(const std::string& sPath, long long int& lValue) const
 {
-    if (has(sKey.c_str(), BPTInteger)) {
-        lValue = dynamic_cast<const bplus::Integer*>(get(sKey.c_str()))->value();
+    if (has(sPath.c_str(), BPTInteger)) {
+        lValue = dynamic_cast<const Integer*>(get(sPath.c_str()))->value();
         return true;
     }
 
@@ -677,10 +673,10 @@ bplus::Map::getLong(const std::string& sKey, long long int& lValue) const
 }
 
 inline bool
-bplus::Map::getMap(const std::string& sKey, const bplus::Map*& pMap) const
+Map::getMap(const std::string& sPath, const Map*& pMap) const
 {
-    if (has(sKey.c_str(), BPTMap)) {
-        pMap = dynamic_cast<const bplus::Map*>(get(sKey.c_str()));
+    if (has(sPath.c_str(), BPTMap)) {
+        pMap = dynamic_cast<const Map*>(get(sPath.c_str()));
         return true;
     }
 
@@ -688,23 +684,25 @@ bplus::Map::getMap(const std::string& sKey, const bplus::Map*& pMap) const
 }
 
 inline bool
-bplus::Map::getString(const std::string& sKey, std::string& sValue) const
+Map::getString(const std::string& sPath, std::string& sValue) const
 {
-    if (has(sKey.c_str(), BPTString)) {
-        sValue = dynamic_cast<const bplus::String*>(get(sKey.c_str()))->value();
+    if (has(sPath.c_str(), BPTString)) {
+        sValue = dynamic_cast<const String*>(get(sPath.c_str()))->value();
         return true;
     }
 
     return false;
 }
 
-inline bplus::Map::Iterator::Iterator(const class bplus::Map& m) {
+inline
+//Map::Iterator::Iterator(const class Map& m) {
+Map::Iterator::Iterator(const Map& m) {
     m_it = m.keys.begin();
     m_m = &m;
 }
 
 inline const char *
-bplus::Map::Iterator::nextKey()
+Map::Iterator::nextKey()
 {
     if (m_it == m_m->keys.end()) return NULL;
     const char * key = (*m_it).c_str();
@@ -712,9 +710,10 @@ bplus::Map::Iterator::nextKey()
     return key;
 }
 
-inline bplus::Map::operator std::map<std::string, const bplus::Object *>() const
+inline 
+Map::operator std::map<std::string, const Object *>() const
 {
-    std::map<std::string, const bplus::Object *> m;
+    std::map<std::string, const Object *> m;
     Iterator i(*this);
     const char * k;
     while (NULL != (k = i.nextKey())) m[k] = value(k);
@@ -722,83 +721,92 @@ inline bplus::Map::operator std::map<std::string, const bplus::Object *>() const
     
 }
 
-inline bplus::Integer::Integer(BPInteger num)
+inline 
+Integer::Integer(BPInteger num)
     : Object(BPTInteger)
 {
     e.value.integerVal = num;
 }
 
-inline bplus::Integer::~Integer()
+inline 
+Integer::~Integer()
 {
 }
 
 inline BPInteger
-bplus::Integer::value() const
+Integer::value() const
 {
     return e.value.integerVal;
 }
 
-inline bplus::Object * 
-bplus::Integer::clone() const
+inline Object * 
+Integer::clone() const
 {
     return new Integer(*this);
 }
 
-inline bplus::Integer::operator long long() const 
+inline 
+Integer::operator long long() const 
 {
     return value();
 }
 
-inline bplus::CallBack::CallBack(BPCallBack cb) : Integer(cb)
+inline 
+CallBack::CallBack(BPCallBack cb) : Integer(cb)
 {
     e.type = BPTCallBack;
 }
 
-inline bplus::Object * 
-bplus::CallBack::clone() const
+inline Object * 
+CallBack::clone() const
 {
     return new CallBack(*this);
 }
 
-inline bplus::CallBack::~CallBack()
+inline
+CallBack::~CallBack()
 {
 }
 
-inline bplus::Double::Double(BPDouble num)
+inline 
+Double::Double(BPDouble num)
     : Object(BPTDouble)
 {
     e.value.doubleVal = num;
 }
 
-inline bplus::Double::~Double()
+inline 
+Double::~Double()
 {
 }
 
 inline BPDouble
-bplus::Double::value() const
+Double::value() const
 {
     return e.value.doubleVal;
 }
 
-inline bplus::Object *
-bplus::Double::clone() const
+inline Object *
+Double::clone() const
 {
     return new Double(*this);
 }
 
-
-inline bplus::Double::operator double() const 
+inline 
+Double::operator double() const 
 {
     return value();
 }
 
-inline bplus::List::List() : Object(BPTList)
+inline 
+List::List() : Object(BPTList)
 {
     e.value.listVal.size = 0;
     e.value.listVal.elements = NULL;
 }
 
-inline bplus::List::List(const List & other) : Object(BPTList)
+inline 
+List::List(const List & other) : Object(BPTList)
 {
     e.value.listVal.size = 0;
     e.value.listVal.elements = NULL;
@@ -808,8 +816,8 @@ inline bplus::List::List(const List & other) : Object(BPTList)
     }
 }
 
-inline bplus::List &
-bplus::List::operator= (const List & other)
+inline List &
+List::operator= (const List & other)
 {
     // release
     for (unsigned int i = 0; i < values.size(); i++) delete values[i];
@@ -828,7 +836,8 @@ bplus::List::operator= (const List & other)
     return *this;
 }
 
-inline bplus::List::~List()
+inline
+List::~List()
 {
     for (unsigned int i = 0; i < values.size(); i++)
     {
@@ -842,23 +851,24 @@ inline bplus::List::~List()
 }
 
 inline unsigned int
-bplus::List::size() const
+List::size() const
 {
     return e.value.listVal.size;
 }
 
-inline const bplus::Object *
-bplus::List::value(unsigned int i) const
+inline const Object *
+List::value(unsigned int i) const
 {
+//  BPASSERT(e.value.listVal.size == values.size());
     assert(e.value.listVal.size == values.size());
     if (i >= e.value.listVal.size) return NULL;
     return values[i];
 }
 
-inline const bplus::Object &
-bplus::List::operator[](unsigned int index) const
+inline const Object &
+List::operator[](unsigned int index) const
 {
-    const bplus::Object * v = value(index);
+    const Object * v = value(index);
     if (v == NULL) {
         throw bplus::ConversionException("no such element in list, range error");
     }
@@ -867,8 +877,9 @@ bplus::List::operator[](unsigned int index) const
 }
 
 inline void
-bplus::List::append(bplus::Object * object)
+List::append(Object * object)
 {
+//  BPASSERT(object != NULL);
     assert(object != NULL);
     values.push_back(object);
     e.value.listVal.size++;
@@ -879,17 +890,19 @@ bplus::List::append(bplus::Object * object)
         (BPElement *) object->elemPtr();
 }
 
-inline bplus::Object *
-bplus::List::clone() const
+inline Object *
+List::clone() const
 {
-    return new bplus::List(*this);
+    return new List(*this);
 }
 
-inline bplus::List::operator std::vector<const bplus::Object *>() const
+inline 
+List::operator std::vector<const Object *>() const
 {
     std::vector<const Object *> v;
     for (unsigned int i = 0; i < size(); i++) v.push_back(value(i));
     return v;
 }
 
-#endif // BPTYPEUTILIMPL_H_
+
+} // namespace bplus

@@ -13,39 +13,38 @@
  * The Original Code is BrowserPlus (tm).
  * 
  * The Initial Developer of the Original Code is Yahoo!.
- * Portions created by Yahoo! are Copyright (C) 2006-2009 Yahoo!.
- * All Rights Reserved.
+ * Portions created by Yahoo! are Copyright (c) 2010 Yahoo! Inc.
+ * All rights reserved.
  * 
  * Contributor(s): 
  * ***** END LICENSE BLOCK *****
  */
 
 /**
- * bpservicedescription.h
- * 
- * An abstraction around the in-memory representation of a description
- * of a service's interface.
+ * ServiceDescription
  *
- * XXX: this c++ representation should be augmented to store information
- *      internally in a format that can be transmitted over the
- *      service API (BPCoreletDefinition).
+ * A Class which describes the functionality provided by a service.
  */
 
 #ifndef BPSERVICEDESCRIPTION_H_
 #define BPSERVICEDESCRIPTION_H_
 
 #include <list>
-#include "bpserviceversion.h"
-#include "bputil/bptypeutil.h"
-#include "bpserviceapi/bpdefinition.h"
+#include <map>
 
+#include "bputil/bpsemanticversion.h"
+#include "bputil/bptypeutil.h"
+#include "bpserviceapi/bpdefinition.h" 
+
+
+// default copy constructors and assignment operators sufficient
 
 namespace bplus {
 namespace service {
 
 
 /**
- * an in memory representation of an argument to a function on a corelet
+ * an in memory representation of an argument to a function on a service
  */ 
 class Argument
 {
@@ -61,6 +60,7 @@ public:
         List,
         CallBack,
         Path,
+        WritablePath,
         Any
     };
 
@@ -94,7 +94,7 @@ public:
     /**
      * generate a BPArgumentDefinition representation of this function.
      * This pointer will point to memory managed by this class,
-     * that will not change until toBPCoreletDefinition is called again,
+     * that will not change until toBPServiceDefinition is called again,
      * or the instance is deleted.
      */
     void toBPArgumentDefinition(BPArgumentDefinition * argDef);
@@ -107,7 +107,7 @@ private:
 };
 
 /**
- * an in memory representation of a function supported by a corelet
+ * an in memory representation of a function supported by a service
  */ 
 class Function
 {
@@ -123,9 +123,6 @@ public:
     std::list<Argument> arguments() const;
     void setArguments(const std::list<Argument> & arguments);    
 
-    /** add an argument to the current list */
-    void addArgument( const Argument& argument );
-    
     bool getArgument(const char * name, Argument & oArg) const;
 
     std::string docString() const;
@@ -139,7 +136,7 @@ public:
     /**
      * populate a pointer to a BPFunctionDefinition with pointers into
      * internal memory that will not change until
-     * toBPCoreletDefinition is called again, or the instance is
+     * toBPServiceDefinition is called again, or the instance is
      * deleted.
      */
     void toBPFunctionDefinition(BPFunctionDefinition * func);
@@ -153,14 +150,14 @@ private:
 };
 
 /**
- * an in memory description of a corelet's interface
+ * an in memory description of a service's interface
  */ 
 class Description
 {
 public:
     Description();
-    Description(const Description & d);
-    Description & operator=(const Description & d);
+    Description(const Description & f);
+    Description & operator=(const Description & f);
     ~Description();    
 
     std::string name() const;
@@ -170,27 +167,27 @@ public:
      *  micro joined with '.' */
     std::string versionString() const;
 
-    /** get corelet version */
-    Version version() const;
+    /** get a string of the form: "name major.minor.version" */
+    std::string nameVersionString() const;
 
-    /** set corelet version */
-    void setVersion(const Version& version);
+    void setVersion( const std::string& version );
+    
+    const bplus::SemanticVersion& version() const;
 
-    /** get corelet major version */
-    unsigned int majorVersion() const;
+    /** get service major version */
+    int majorVersion() const;
+    /** set service major version */
+    void setMajorVersion(int majorVersion);    
 
-    /** set corelet major version */
-    void setMajorVersion(unsigned int majorVersion);    
+    /** get service minor version */
+    int minorVersion() const;
+    /** set service minor version */
+    void setMinorVersion(int minorVersion);    
 
-    /** get corelet minor version */
-    unsigned int minorVersion() const;
-    /** set corelet minor version */
-    void setMinorVersion(unsigned int minorVersion);    
-
-    /** get corelet micro version */
-    unsigned int microVersion() const;
-    /** set corelet micro version */
-    void setMicroVersion(unsigned int microVersion);    
+    /** get service micro version */
+    int microVersion() const;
+    /** set service micro version */
+    void setMicroVersion(int microVersion);    
 
     std::string docString() const;
     void setDocString(const char * docString);    
@@ -200,7 +197,7 @@ public:
 
     /** add a function to the current list */
     void addFunction(const Function& function);
-    
+
     bool hasFunction(const char * funcName) const;
 
     /** get the function description */
@@ -208,30 +205,30 @@ public:
 
     /** get pointer to requested function or 0 if not found */
     Function* getFunction(const char * funcName ) const;
-    
-    /** generate a bplus::Object representation of the corelet description.
+
+    /** generate a bp::Object representation of the service description.
      *  caller assumes ownership of returned value */
     bplus::Object* toBPObject() const;
     
-    /** populate the structure from a bplus::Object representation.
+    /** populate the structure from a bp::Object representation.
      *  returns false on failure, true on success. */
     bool fromBPObject(const bplus::Object* bp);
 
     /**
-     * populate the structure from a BPCoreletDefinition memory structure
+     * populate the structure from a BPServiceDefinition memory structure
      * returns false on failure, true on success.
      */
-    bool fromBPCoreletDefinition(const BPCoreletDefinition * bpcd);
+    bool fromBPServiceDefinition(const BPServiceDefinition * bpcd);
 
     /**
-     * generate a BPCoreletDefinition representation of this service's
+     * generate a BPServiceDefinition representation of this service's
      * interface.  This pointer will point to memory managed by this class,
-     * that will not change until toBPCoreletDefinition is called again,
+     * that will not change until toBPServiceDefinition is called again,
      * or the instance is deleted.
      */
-    const BPCoreletDefinition * toBPCoreletDefinition(void);
+    const BPServiceDefinition * toBPServiceDefinition(void);
 
-    /** Does this corelet description describe a built in corelet? */
+    /** Does this service description describe a built in service? */
     bool isBuiltIn() const;
     void setIsBuiltIn(bool isBuiltIn);
 
@@ -240,24 +237,23 @@ public:
 
     /** generate a human readable buffer of the interface of the service */
     std::string toHumanReadableString() const;
-
+    
 private:
-    std::string m_name;
-    unsigned int m_majorVersion;    
-    unsigned int m_minorVersion;    
-    unsigned int m_microVersion;    
-    std::string m_docString;
-    std::list<Function> m_functions;
-    // true for built in corelets, added using the
-    // CoreletRegistry::registerCorelet() call
+    std::string             m_name;
+    SemanticVersion         m_version;
+    std::string             m_docString;
+    std::list<Function>     m_functions;
+    
+    // true for built in services, added using the
+    // ServiceRegistry::registerService() call
     bool m_builtIn;
 
-    BPCoreletDefinition * m_def;
+    BPServiceDefinition*    m_def;
     void freeDef();
 };
 
 /**
- * validate arguments given a bplus::Map containing arguments and a
+ * validate arguments given a bp::Map containing arguments and a
  * function description describing a function's interface.
  *
  * NOTE:  "arguments" may be modified, for example when converting double
@@ -268,17 +264,15 @@ private:
  *
  * returns non-empty string on failure, containing a verbose error message
  */
-std::string validateArguments(const bplus::service::Function & fdesc,
+std::string validateArguments(const Function& fdesc,
                               bplus::Map* arguments);
 
-
-std::string
-validateArguments(const bplus::service::Function & desc, bplus::Map* arguments);
-
-
+std::string validateArguments(const Function& desc,
+                              bplus::Map* arguments);
+ 
 } // namespace service
 } // namespace bplus
-
+    
 
 //////////////////////////////////////////////////////////////////////
 // Get the implementations.

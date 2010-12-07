@@ -13,96 +13,102 @@
  * The Original Code is BrowserPlus (tm).
  * 
  * The Initial Developer of the Original Code is Yahoo!.
- * Portions created by Yahoo! are Copyright (C) 2006-2009 Yahoo!.
- * All Rights Reserved.
+ * Portions created by Yahoo! are Copyright (c) 2010 Yahoo! Inc.
+ * All rights reserved.
  * 
  * Contributor(s): 
  * ***** END LICENSE BLOCK *****
  */
 
 /**
- *  Inline implementation file for bpservicedescription.h.
- * 
- *  Note: This file is included by bpservicedescription.h.
- *        It is not intended for direct inclusion by client code.
- *       
+ * Description
+ *
+ * A Class which describes the functionality provided by a service.
  */
-#ifndef BPSERVICEDESRIPTIONIMPL_H_
-#define BPSERVICEDESRIPTIONIMPL_H_
 
-#include <sstream>
+#ifndef BPSERVICEDESCRIPTIONIMPL_H_
+#define BPSERVICEDESCRIPTIONIMPL_H_
+
+#include <assert.h>
 #include <set>
+#include <sstream>
 
 
-inline bplus::service::Argument::Argument()
+using bplus::service::Argument;
+using bplus::service::Function;
+using bplus::service::Description;
+
+
+inline
+Argument::Argument()
     : m_type(None),
       m_required(true)
 {
 }
 
-inline bplus::service::Argument::Argument(const char * name,
-                                   bplus::service::Argument::Type t)
+inline
+Argument::Argument(const char * name, Argument::Type t)
     : m_required(true)
 {
     setType(t);
     setName(name);
 }
 
-
-inline bplus::service::Argument::~Argument()
+inline
+Argument::~Argument()
 {
 }
 
 inline std::string
-bplus::service::Argument::name() const
+Argument::name() const
 {
     return m_name;
 }
 
 inline void
-bplus::service::Argument::setName(const char * name)
+Argument::setName(const char * name)
 {
     m_name = name;
 }
 
-inline bplus::service::Argument::Type
-bplus::service::Argument::type() const
+inline Argument::Type
+Argument::type() const
 {
     return m_type;
 }
 
 inline void
-bplus::service::Argument::setType(Type type)
+Argument::setType(Type type)
 {
     m_type = type;
 }
 
 inline bool
-bplus::service::Argument::required() const
+Argument::required() const
 {
     return m_required;
 }
 
 inline void
-bplus::service::Argument::setRequired(bool required)
+Argument::setRequired(bool required)
 {
     m_required = required;
 }
 
 inline std::string
-bplus::service::Argument::docString() const
+Argument::docString() const
 {
     return m_docString;
 }
 
 inline void
-bplus::service::Argument::setDocString(const char * docString)
+Argument::setDocString(const char * docString)
 {
     m_docString = docString;
 }
 
 inline const char *
-bplus::service::Argument::typeAsString(Type type)
+Argument::typeAsString(Type type)
 {
     switch (type) {
         case None: return "none";
@@ -114,14 +120,15 @@ bplus::service::Argument::typeAsString(Type type)
         case Map: return "map";
         case List: return "list";
         case CallBack: return "callback";
+        case WritablePath: return "writablePath";
         case Path: return "path";
         case Any: return "any";
     }
     return "unknown";
 }
 
-inline bplus::service::Argument::Type
-bplus::service::Argument::stringAsType(const char * str)
+inline Argument::Type
+Argument::stringAsType(const char * str)
 {
     Type t = None;
     if (str != NULL) {
@@ -134,13 +141,14 @@ bplus::service::Argument::stringAsType(const char * str)
         else if (!strcmp(str, "list")) t = List;
         else if (!strcmp(str, "callback")) t = CallBack;
         else if (!strcmp(str, "path")) t = Path;
+        else if (!strcmp(str, "writablePath")) t = WritablePath;
         else if (!strcmp(str, "any")) t = Any;
     }
     return t;
 }
 
 inline void 
-bplus::service::Argument::clear()
+Argument::clear()
 {
     m_name.clear();
     m_docString.clear();
@@ -149,7 +157,7 @@ bplus::service::Argument::clear()
 }
 
 inline bool 
-bplus::service::Argument::fromBPArgumentDefinition(const BPArgumentDefinition * def)
+Argument::fromBPArgumentDefinition(const BPArgumentDefinition * def)
 {
     clear();
 
@@ -164,19 +172,19 @@ bplus::service::Argument::fromBPArgumentDefinition(const BPArgumentDefinition * 
         case BPTMap: m_type = Map; break;
         case BPTList: m_type = List; break;
         case BPTCallBack: m_type = CallBack; break;
-        case BPTPath: m_type = Path; break;
+        case BPTNativePath: m_type = Path; break;
+        case BPTWritableNativePath: m_type = WritablePath; break;
         case BPTAny: m_type = Any; break;
         default: m_type = None; break;
     }
-    m_required = def->required != 0;
+    m_required = def->required;
     
     return true;
 }
 
 inline void
-bplus::service::Argument::toBPArgumentDefinition(BPArgumentDefinition * argDef)
+Argument::toBPArgumentDefinition(BPArgumentDefinition * argDef)
 {
-    
     argDef->name = (char *) m_name.c_str();
     argDef->docString = (char *) m_docString.c_str();
     switch (m_type) {
@@ -189,18 +197,19 @@ bplus::service::Argument::toBPArgumentDefinition(BPArgumentDefinition * argDef)
         case Map: argDef->type = BPTMap; break;
         case List: argDef->type = BPTList; break;
         case CallBack: argDef->type = BPTCallBack; break;
-        case Path: argDef->type = BPTPath; break;
+        case Path: argDef->type = BPTNativePath; break;
+        case WritablePath: argDef->type = BPTWritableNativePath; break;
         case Any: argDef->type = BPTAny; break;
     }
     argDef->required = m_required;
 }
 
-inline bplus::service::Function::Function()
+inline Function::Function()
     : m_adefs(NULL)
 {
 }
 
-inline bplus::service::Function::Function(const bplus::service::Function & f)
+inline Function::Function(const Function & f)
     : m_name(f.m_name),
       m_docString(f.m_docString),
       m_arguments(f.m_arguments),
@@ -208,23 +217,19 @@ inline bplus::service::Function::Function(const bplus::service::Function & f)
 {
 }
 
-inline bplus::service::Function &
-bplus::service::Function::operator=(const bplus::service::Function & f)
+inline Function &
+Function::operator=(const Function & f)
 {
     m_name = f.m_name;
     m_docString = f.m_docString;
     m_arguments = f.m_arguments;
-    
-    if (m_adefs) {
-        free(m_adefs);
-    }
+    if (m_adefs) free(m_adefs);
     m_adefs = NULL;
     return *this;
 }
 
-inline bplus::service::Function::~Function()
+inline Function::~Function()
 {
-    
     if (m_adefs) {
         free(m_adefs);
         m_adefs = NULL;
@@ -232,25 +237,25 @@ inline bplus::service::Function::~Function()
 }
 
 inline std::string
-bplus::service::Function::name() const
+Function::name() const
 {
     return m_name;
 }
 
 inline void
-bplus::service::Function::setName(const char * name)
+Function::setName(const char * name)
 {
     m_name = name;
 }
 
-inline std::list<bplus::service::Argument>
-bplus::service::Function::arguments() const
+inline std::list<Argument>
+Function::arguments() const
 {
     return m_arguments;
 }
 
 inline bool
-bplus::service::Function::getArgument(const char * name, Argument &oArg) const
+Function::getArgument(const char * name, Argument &oArg) const
 {
     std::list<Argument>::const_iterator it;
     
@@ -267,32 +272,26 @@ bplus::service::Function::getArgument(const char * name, Argument &oArg) const
 }
 
 inline void
-bplus::service::Function::setArguments(
-    const std::list<bplus::service::Argument> & arguments) 
+Function::setArguments(
+    const std::list<Argument> & arguments) 
 {
     m_arguments = arguments;
 }
 
-inline void
-bplus::service::Function::addArgument(const Argument& argument)
-{
-    m_arguments.push_back( argument );
-}
-                                  
 inline std::string
-bplus::service::Function::docString() const
+Function::docString() const
 {
     return m_docString;
 }
 
 inline void
-bplus::service::Function::setDocString(const char * docString)
+Function::setDocString(const char * docString)
 {
     m_docString = docString;
 }
 
 inline void 
-bplus::service::Function::clear()
+Function::clear()
 {
     m_name.clear();
     m_docString.clear();
@@ -300,7 +299,7 @@ bplus::service::Function::clear()
 }
 
 inline bool 
-bplus::service::Function::fromBPFunctionDefinition(const BPFunctionDefinition * def)
+Function::fromBPFunctionDefinition(const BPFunctionDefinition * def)
 {
     clear();
     if (!def) return false;
@@ -322,9 +321,8 @@ bplus::service::Function::fromBPFunctionDefinition(const BPFunctionDefinition * 
 }
 
 inline void
-bplus::service::Function::toBPFunctionDefinition(BPFunctionDefinition * func)
+Function::toBPFunctionDefinition(BPFunctionDefinition * func)
 {
-    
     if (m_adefs) {
         free(m_adefs);
         m_adefs = NULL;
@@ -346,96 +344,69 @@ bplus::service::Function::toBPFunctionDefinition(BPFunctionDefinition * func)
             i->toBPArgumentDefinition(m_adefs + x);
         }
     }
+    
 }
 
-inline bplus::service::Description::Description()
-    : m_majorVersion(0),
-      m_minorVersion(0),
-      m_microVersion(0),
-      m_builtIn(false),
-      m_def(NULL)
+
+//////////////////
+// Description
+
+inline Description::Description() : 
+    m_builtIn(false),
+    m_def(NULL)
 {
 }
 
-inline bplus::service::Description::Description(const bplus::service::Description & d)
-    : m_name(d.m_name), 
-    m_majorVersion(d.m_majorVersion),    
-    m_minorVersion(d.m_minorVersion),    
-    m_microVersion(d.m_microVersion),
-    m_docString(d.m_docString), 
-    m_functions(d.m_functions),
-    m_builtIn(d.m_builtIn),
-    m_def(NULL)  // generated on demand, don't copy
-{
-}
-
-inline bplus::service::Description &
-bplus::service::Description::operator=(const bplus::service::Description & d)
-{
-    m_name = d.m_name;
-    m_majorVersion = d.m_majorVersion;
-    m_minorVersion = d.m_minorVersion;
-    m_microVersion = d.m_microVersion;
-    m_docString= d.m_docString;
-    m_functions = d.m_functions;
-    m_builtIn = d.m_builtIn;
-
-    if (m_def) free(m_def); // m_def is demand generated!
-    m_def = NULL;
-
-    return *this;
-}
-
-inline bplus::service::Description::~Description()
+inline Description::~Description()
 {
     freeDef();
 }
 
 inline bool
-bplus::service::Description::isBuiltIn() const
+Description::isBuiltIn() const
 {
     return m_builtIn;
 }
 
 inline void
-bplus::service::Description::setIsBuiltIn(bool x)
+Description::setIsBuiltIn(bool x)
 {
     m_builtIn = x;
 }
 
 inline std::string
-bplus::service::Description::name() const
+Description::name() const
 {
     return m_name;
 }
 
 inline void
-bplus::service::Description::setName(const char * name)
+Description::setName(const char * name)
 {
     m_name = name;
 }
 
 inline std::string
-bplus::service::Description::docString() const
+Description::docString() const
 {
     return m_docString;
 }
 
 inline void
-bplus::service::Description::setDocString(const char * docString)
+Description::setDocString(const char * docString)
 {
     m_docString = docString;
 }
 
-inline std::list<bplus::service::Function>
-bplus::service::Description::functions() const
+inline std::list<Function>
+Description::functions() const
 {
     return m_functions;
 }
 
 inline void
-bplus::service::Description::setFunctions(
-    const std::list<bplus::service::Function> & functions)
+Description::setFunctions(
+    const std::list<Function> & functions)
 {
     m_functions = functions;
 }
@@ -447,8 +418,8 @@ bplus::service::Description::addFunction( const Function& function )
 }
 
 inline bool
-bplus::service::Description::getFunction(const char * funcName,
-                                  bplus::service::Function & oFunc) const
+Description::getFunction(const char * funcName,
+                         Function & oFunc) const
 {
     std::list<Function>::const_iterator it;
     
@@ -464,102 +435,71 @@ bplus::service::Description::getFunction(const char * funcName,
     return false;
 }
 
-inline bplus::service::Function*
-bplus::service::Description::getFunction(const char * funcName) const
-{
-	std::list<bplus::service::Function>::const_iterator it;
-
-    for (it = m_functions.begin(); it != m_functions.end(); it++) {
-        if (!it->name().compare(funcName)) {
-			return const_cast<bplus::service::Function*>(&(*it));
-        }
-    }
-
-    return NULL;
-}
 
 inline bool
-bplus::service::Description::hasFunction(const char * funcName) const
+Description::hasFunction(const char * funcName) const
 {
     Function f;
     return getFunction(funcName, f);
 }
 
 inline std::string
-bplus::service::Description::versionString() const
+Description::versionString() const
 {
-    std::stringstream ss;
-    ss << m_majorVersion << "." << m_minorVersion << "." << m_microVersion;
-    return ss.str();
+    return m_version.asString();
 }
 
-inline bplus::service::Version
-bplus::service::Description::version() const
+inline std::string
+Description::nameVersionString() const
 {
-    bplus::service::Version v;
-    v.setMajor(m_majorVersion);
-    v.setMinor(m_minorVersion);    
-    v.setMicro(m_microVersion);    
-
-    return v;
+    return name() + " " + versionString();
 }
 
 inline void
-bplus::service::Description::setVersion(const bplus::service::Version& version)
+Description::setVersion(const std::string& version)
 {
-    // Note: service::Version uses -1 as a "not set" indicator.
-    if (version.majorVer() >= 0) {
-        m_majorVersion = version.majorVer();
-    }
-
-    if (version.minorVer() >= 0) {
-        m_minorVersion = version.minorVer();
-    }
-
-    if (version.microVer() >= 0) {
-        m_microVersion = version.microVer();
-    }
+    m_version.parse(version);
 }
 
-inline unsigned int
-bplus::service::Description::majorVersion() const
+inline int
+Description::majorVersion() const
 {
-    return m_majorVersion;    
+    return m_version.majorVer();    
 }
 
 inline void
-bplus::service::Description::setMajorVersion(unsigned int majorVersion)
+Description::setMajorVersion(int majorVersion)
 {
-    m_majorVersion = majorVersion;    
+    m_version.setMajor(majorVersion);    
 }
 
-inline unsigned int
-bplus::service::Description::minorVersion() const
+inline int
+Description::minorVersion() const
 {
-    return m_minorVersion;
-}
-
-inline void
-bplus::service::Description::setMinorVersion(unsigned int minorVersion)
-{
-    m_minorVersion = minorVersion;    
-}
-
-inline unsigned int
-bplus::service::Description::microVersion() const
-{
-    return m_microVersion;
+    return m_version.minorVer();
 }
 
 inline void
-bplus::service::Description::setMicroVersion(unsigned int microVersion)
+Description::setMinorVersion(int minorVersion)
 {
-    m_microVersion = microVersion;
+    m_version.setMinor(minorVersion);
+}
+
+inline int
+Description::microVersion() const
+{
+    return m_version.microVer();
+}
+
+inline void
+Description::setMicroVersion(int microVersion)
+{
+    m_version.setMicro(microVersion);
 }
 
 
 inline bplus::Object*
-bplus::service::Description::toBPObject() const
+Description::toBPObject() const
 {
     // This builds a description which will be sent to clients.
     // Hence, the JSON includes bplus::Object type info.
@@ -622,7 +562,7 @@ bplus::service::Description::toBPObject() const
 }
 
 inline bool
-bplus::service::Description::fromBPObject(const Object* bp)
+Description::fromBPObject(const bplus::Object* bp)
 {
     // This parses JSON that comes from the server.  Hence, it
     // is "regular" json without all of the bplus::Object type info.
@@ -653,7 +593,7 @@ bplus::service::Description::fromBPObject(const Object* bp)
     
     if (m->has("functions", BPTList)) {
         const List* l = dynamic_cast<const List*>(m->get("functions"));
-        assert(l != NULL);
+//      BPASSERT(l != NULL);
 
         unsigned int i;
         
@@ -711,25 +651,31 @@ bplus::service::Description::fromBPObject(const Object* bp)
 }
 
 inline void 
-bplus::service::Description::clear()
+Description::clear()
 {
     m_name.clear();
-    m_majorVersion = m_minorVersion = m_microVersion = 0;
+    m_version = SemanticVersion();
     m_docString.clear();
     m_functions.clear();
     m_builtIn = false;
 }
 
+inline const bplus::SemanticVersion&
+Description::version() const
+{
+    return m_version;
+}
+
 inline bool 
-bplus::service::Description::fromBPCoreletDefinition(const BPCoreletDefinition * def)
+Description::fromBPServiceDefinition(const BPServiceDefinition * def)
 {
     clear();
     if (!def) return false;
 
-    if (def->coreletName) m_name.append(def->coreletName);
-    m_majorVersion = def->majorVersion;    
-    m_minorVersion = def->minorVersion;
-    m_microVersion = def->microVersion;
+    if (def->serviceName) m_name.append(def->serviceName);
+    m_version.setMajor(def->majorVersion);    
+    m_version.setMinor(def->minorVersion);
+    m_version.setMicro(def->microVersion);
     if (def->docString) m_docString.append(def->docString);    
 
     // now functions
@@ -748,8 +694,8 @@ bplus::service::Description::fromBPCoreletDefinition(const BPCoreletDefinition *
 
 
 inline std::string
-bplus::service::validateArguments(const bplus::service::Function & desc,
-                               bplus::Map* arguments)
+bplus::service::validateArguments(const Function & desc,
+                                  Map* arguments)
 {
     // We do this verification in two, expensive iterations.  suspect
     // n is sufficiently small that it doesn't matter.  let the profiler
@@ -772,7 +718,7 @@ bplus::service::validateArguments(const bplus::service::Function & desc,
         const char* name = NULL;
         while ((name = iter.nextKey()) != NULL) 
         {
-            bplus::service::Argument adesc;
+            Argument adesc;
 
             // unknown argument
             if (!desc.getArgument(name, adesc))
@@ -785,59 +731,65 @@ bplus::service::validateArguments(const bplus::service::Function & desc,
 
             // argument is known, now check type
             const char * gottype = NULL;
-            if (adesc.type() != bplus::service::Argument::Any) {
+            if (adesc.type() != Argument::Any) {
                 switch (arguments->value(name)->type())
                 {
                     case BPTBoolean:
-                        if (adesc.type() != bplus::service::Argument::Boolean)
+                        if (adesc.type() != Argument::Boolean)
                         {
                             gottype = "boolean";
                         }
                         break;
                     case BPTDouble:
-                        if (adesc.type() != bplus::service::Argument::Double)
+                        if (adesc.type() != Argument::Double)
                         {
                             gottype = "double";
                         }
                         break;
                     case BPTCallBack:
-                        if (adesc.type() != bplus::service::Argument::CallBack)
+                        if (adesc.type() != Argument::CallBack)
                         {
                             gottype = "callback";
                         }
                         break;
                     case BPTInteger:
-                        if (adesc.type() != bplus::service::Argument::Integer)
+                        if (adesc.type() != Argument::Integer)
                         {
                             gottype = "integer";
                         }
                         break;
                     case BPTList:
-                        if (adesc.type() != bplus::service::Argument::List)
+                        if (adesc.type() != Argument::List)
                         {
                             gottype = "list";
                         }
                         break;
                     case BPTMap:
-                        if (adesc.type() != bplus::service::Argument::Map)
+                        if (adesc.type() != Argument::Map)
                         {
                             gottype = "map";
                         }
                         break;
                     case BPTString:
-                        if (adesc.type() != bplus::service::Argument::String)
+                        if (adesc.type() != Argument::String)
                         {
                             gottype = "string";
                         }
                         break;
-                    case BPTPath:
-                        if (adesc.type() != bplus::service::Argument::Path)
+                    case BPTNativePath:
+                        if (adesc.type() != Argument::Path)
                         {
                             gottype = "path";
                         }
                         break;
+                    case BPTWritableNativePath:
+                        if (adesc.type() != Argument::WritablePath)
+                        {
+                            gottype = "writablePath";
+                        }
+                        break;
                     case BPTNull:
-                        if (adesc.type() != bplus::service::Argument::Null)
+                        if (adesc.type() != Argument::Null)
                         {
                             gottype = "null";
                         }
@@ -853,7 +805,7 @@ bplus::service::validateArguments(const bplus::service::Function & desc,
             {
                 // Allow conversion between int and double.  Needed
                 // since Safari often sends integers as doubles
-                std::string expected(bplus::service::Argument::typeAsString(adesc.type()));
+                std::string expected(Argument::typeAsString(adesc.type()));
                 std::string got(gottype);
                 if (!expected.compare("integer") && !got.compare("double")) {
                     const bplus::Double* oldVal = 
@@ -869,7 +821,7 @@ bplus::service::validateArguments(const bplus::service::Function & desc,
                     std::stringstream ss;
                     ss << "argument '" << name
                        << "' should be of type "
-                       << bplus::service::Argument::typeAsString(adesc.type())
+                       << Argument::typeAsString(adesc.type())
                        << ", but is of type " << gottype;
                     return ss.str();
                 }
@@ -878,17 +830,17 @@ bplus::service::validateArguments(const bplus::service::Function & desc,
             // we're cool.  add this to the set of arguments we have
             haveArgs.insert(name);
         }
+
+        // modify args as needed
+        std::map<std::string, bplus::Object*>::iterator miter;
+        for (miter = mods.begin(); miter != mods.end(); ++miter) {
+            arguments->add(miter->first.c_str(), miter->second);
+        }
     }
         
-    // modify args as needed
-    std::map<std::string, bplus::Object*>::iterator miter;
-    for (miter = mods.begin(); miter != mods.end(); ++miter) {
-        arguments->add(miter->first.c_str(), miter->second);
-    }
-    
     // verify all required arguments are present
-    std::list<bplus::service::Argument> args = desc.arguments();
-    std::list<bplus::service::Argument>::iterator ait;    
+    std::list<Argument> args = desc.arguments();
+    std::list<Argument>::iterator ait;    
     for (ait = args.begin(); ait != args.end(); ait++)
     {
         if (ait->required())
@@ -909,7 +861,7 @@ bplus::service::validateArguments(const bplus::service::Function & desc,
 
 // try to format a doc string, breaking lines at 60 chars
 #define DEFAULTBREAKAT 70
-static std::string
+inline static std::string
 formatDocString(const char * str, const char * pad = NULL,
                 unsigned int breakat = DEFAULTBREAKAT)
 {
@@ -941,11 +893,11 @@ formatDocString(const char * str, const char * pad = NULL,
 
 #define MYSPACE "   "
 inline std::string
-bplus::service::Description::toHumanReadableString() const
+Description::toHumanReadableString() const
 {
     std::stringstream ss;
     
-    ss << "Describing corelet '"
+    ss << "Describing service '"
        << (name().empty() ? "unknown" : name())
        << "', version: "
        << versionString() << std::endl;
@@ -957,8 +909,8 @@ bplus::service::Description::toHumanReadableString() const
            << std::endl;
     }
 
-    std::list<bplus::service::Function> functions = this->functions();
-    std::list<bplus::service::Function>::iterator fit;
+    std::list<Function> functions = this->functions();
+    std::list<Function>::iterator fit;
 
     ss << std::endl;        
     ss << functions.size() << " function(s) supported:" << std::endl;
@@ -975,8 +927,8 @@ bplus::service::Description::toHumanReadableString() const
         }
         
         // now for arguments
-        std::list<bplus::service::Argument> arguments = fit->arguments();
-        std::list<bplus::service::Argument>::iterator ait;
+        std::list<Argument> arguments = fit->arguments();
+        std::list<Argument>::iterator ait;
 
         if (arguments.size() > 0) {
             ss << std::endl;
@@ -1001,7 +953,7 @@ bplus::service::Description::toHumanReadableString() const
 
 
 inline void
-bplus::service::Description::freeDef()
+Description::freeDef()
 {
     if (m_def) {
         if (m_def->functions) free(m_def->functions);
@@ -1010,25 +962,22 @@ bplus::service::Description::freeDef()
     }
 }
 
-inline const BPCoreletDefinition *
-bplus::service::Description::toBPCoreletDefinition(void)
+inline const BPServiceDefinition*
+Description::toBPServiceDefinition(void)
 {
     freeDef();
-    
-    m_def = (BPCoreletDefinition *) calloc(1, sizeof(BPCoreletDefinition));
+    m_def = (BPServiceDefinition *) calloc(1, sizeof(BPServiceDefinition));
     assert(m_def != NULL);
 
-    m_def->coreletName = (char *) m_name.c_str();
-    m_def->majorVersion = m_majorVersion;
-    m_def->minorVersion = m_minorVersion;    
-    m_def->microVersion = m_microVersion;    
+    m_def->serviceName = (char *) m_name.c_str();
+    m_def->majorVersion = m_version.majorVer();
+    m_def->minorVersion = m_version.minorVer();    
+    m_def->microVersion = m_version.microVer();    
     m_def->docString = (char *) m_docString.c_str();
-    
+
     // functions
     if (m_functions.size()) {
-        
         m_def->numFunctions = m_functions.size();
-        
         m_def->functions = (BPFunctionDefinition *)
             calloc(m_functions.size(), sizeof(BPFunctionDefinition));    
 
@@ -1043,5 +992,30 @@ bplus::service::Description::toBPCoreletDefinition(void)
     return m_def;
 }
 
+inline Description::Description(const Description & d) :
+    m_name(d.m_name),
+    m_version(d.m_version),    
+    m_docString(d.m_docString), 
+    m_functions(d.m_functions),
+    m_builtIn(d.m_builtIn),
+    m_def(NULL)  // generated on demand, don't copy
+{
+}
 
-#endif // BPSERVICEDESRIPTIONIMPL_H_
+inline Description &
+Description::operator=(const Description & d)
+{
+    m_name = d.m_name;
+    m_version = d.m_version;
+    m_docString= d.m_docString;
+    m_functions = d.m_functions;
+    m_builtIn = d.m_builtIn;
+
+    if (m_def) free(m_def); // m_def is demand generated!
+    m_def = NULL;
+
+    return *this;
+}
+
+
+#endif // BPSERVICEDESCRIPTIONIMPL_H_

@@ -30,6 +30,8 @@
 #ifndef BPTRANSACTION_H_
 #define BPTRANSACTION_H_
 
+#include "bputil/bppathstring.h"
+//#include "bputil/bpstrutil.h"
 #include "bputil/bptypeutil.h"
 #include "bpserviceapi/bpcfunctions.h"
 
@@ -67,7 +69,7 @@ public:
                                     const bplus::Object& args ) const;
 
     // Prompt the user.
-    unsigned int    promptUser( const std::string& sUtf8PathToHTMLDialog,
+    unsigned int    promptUser( const tPathString& sPathToHTMLDialog,
                                 const bplus::Object& args,
                                 BPUserResponseCallbackFuncPtr responseCallback,
                                 void* context );
@@ -116,12 +118,14 @@ Transaction::invokeCallback( const bplus::Object& ocb,
 
 
 inline unsigned int
-Transaction::promptUser( const std::string& sUtf8PathToHTMLDialog,
+Transaction::promptUser( const tPathString& sPathToHTMLDialog,
                          const bplus::Object& args,
                          BPUserResponseCallbackFuncPtr responseCallback,
                          void* context )
 {
-    return m_pCoreFuncs->prompt( m_nTid, sUtf8PathToHTMLDialog.c_str(),
+    return m_pCoreFuncs->prompt( m_nTid,
+                                 const_cast<const BPPath>(
+                                     sPathToHTMLDialog.c_str()),
                                  args.elemPtr(), responseCallback, context );
 }
 

@@ -132,6 +132,15 @@ inline std::string safeStr(const char* cszIn)
     return cszIn ? cszIn : "";
 }
 
+/**
+ * return a string corresponding to cszIn.
+ * if cszIn is 0, return an empty string.
+ */
+inline std::wstring safeStr(const wchar_t* cszIn)
+{
+    return cszIn ? cszIn : L"";
+}
+
 /** 
  * quote a JSON string
  */

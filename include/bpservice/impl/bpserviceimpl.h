@@ -33,10 +33,6 @@
 namespace bplus {
 namespace service {
 
-// forward decls
-bool callLoadHandler();   
-bool callUnloadHandler();   
-
 
 inline void
 Service::log( unsigned int level,
@@ -48,38 +44,92 @@ Service::log( unsigned int level,
 }
 
 
-inline bool
-Service::onServiceLoad()
-{
-    return true;
-}
-
-
-inline bool
-Service::onServiceUnload()
-{
-    return true;
-}
-
-
 inline std::string Service::fullName()
 {
     return s_description.name() + " " + s_description.versionString();
 }
 
 
-inline const std::map<std::string,std::string>&
-Service::context()
+inline const std::string&
+Service::clientUri()
 {
-    return m_mapContext;
+    return m_clientUri;
+}
+   
+inline const tPathString&
+Service::serviceDir()
+{
+    return m_serviceDir;
 }
 
 
-inline std::string
-Service::context( const std::string& key )
+inline const tPathString&
+Service::dataDir()
 {
-    std::map<std::string, std::string>::iterator it = m_mapContext.find( key );
-    return it == m_mapContext.end() ? "" : it->second;
+    return m_dataDir;
+}
+
+
+inline const tPathString&
+Service::tempDir()
+{
+    return m_tempDir;
+}
+
+
+inline const std::string&
+Service::locale()
+{
+    return m_locale;
+}
+
+
+inline const std::string&
+Service::userAgent()
+{
+    return m_userAgent;
+}
+
+
+inline int
+Service::clientPid()
+{
+    return m_clientPid;
+}
+
+
+
+
+
+// Default no-op implementation
+inline bool
+Service::onInitialize()
+{
+    return true;
+}
+
+
+// Default no-op implementation
+inline bool
+Service::onShutdown()
+{
+    return true;
+}
+
+
+// Default no-op implementation
+inline int
+Service::onInstall(const BPPath serviceDir, const BPPath dataDir)
+{
+    return 0;
+}
+
+
+// Default no-op implementation
+inline int
+Service::onUninstall(const BPPath serviceDir, const BPPath dataDir)
+{
+    return 0;
 }
 
 
@@ -88,25 +138,31 @@ Service::getEntryPoints()
 {
     static BPPFunctionTable s_functionTable =
     {
-        BPP_CORELET_API_VERSION,
+        BPP_SERVICE_API_VERSION,
         bppInitialize,
         bppShutdown,
         bppAllocate,
         bppDestroy,
         bppInvoke,
-        0, 0
+        bppCancel,
+        bppInstall,
+        bppUninstall
     };
 
     return &s_functionTable;
 }
 
 
-inline const BPCoreletDefinition*
+inline const BPServiceDefinition*
 Service::bppInitialize( const BPCFunctionTable* pCoreFuncs,
-                        const BPElement* pParamMap )
+                        const BPPath serviceDir,
+                        const BPPath dependentDir,
+                        const BPElement* pDependentParams )
 {
-    s_pCoreFuncs = pCoreFuncs;
-    s_pParamMap = pParamMap;
+    s_pCoreFuncs        = pCoreFuncs;
+    s_serviceDir        = serviceDir;
+    s_dependentDir      = bplus::strutil::safeStr(dependentDir);
+    s_pDependentParams  = bplus::Object::build(pDependentParams);
 
     setupDescription();
     
@@ -116,12 +172,12 @@ Service::bppInitialize( const BPCFunctionTable* pCoreFuncs,
     //       We could change to return NULL on failure.
     // Note: we prepend fullName because sometimes it isn't available
     //       to higher logging levels at this point.
-    if (!callLoadHandler()) {
-        std::string sLog = "(" + fullName() + ") onServiceLoad() failed. ";
+    if (!callInitializeHook()) {
+        std::string sLog = "(" + fullName() + ") onInitialize() failed. ";
         log( BP_WARN, sLog );
     }
     
-    return s_description.toBPCoreletDefinition();
+    return s_description.toBPServiceDefinition();
 }
 
 
@@ -129,19 +185,32 @@ inline void
 Service::bppShutdown()
 {
     // Call our preprocessor-generated func that knows derived service name.
-    if (!callUnloadHandler()) {
-        log( BP_WARN, "onServiceUnload() failed." );
+    if (!callShutdownHook()) {
+        log( BP_WARN, "onShutdown() failed." );
     }
 }
 
 
 inline int
 Service::bppAllocate( void** instance,
-                      unsigned int attachID,
-                      const BPElement* pContext )
+                      const BPString uri, const BPPath serviceDir,
+                      const BPPath dataDir, const BPPath tempDir,
+                      const BPString locale,
+                      const BPString userAgent, int clientPid )
 {
     Service* pInst = createInstance();
-    pInst->setContext( pContext );
+
+    // Our class factory uses Service default constructor.
+    // So we have to set instance attributes manually.
+    pInst->m_clientUri  = uri;
+    pInst->m_serviceDir = serviceDir;
+    pInst->m_dataDir    = dataDir;
+    pInst->m_tempDir    = tempDir;
+    pInst->m_locale     = locale;
+    pInst->m_userAgent  = userAgent;
+    pInst->m_clientPid  = clientPid;
+    
+    // Let derived service do any needed work now that members are setup.
     pInst->finalConstruct();
 
     *instance = (void*) pInst;
@@ -186,25 +255,22 @@ Service::bppInvoke( void* pvInst,
 
 
 inline void
-Service::setContext( const BPElement* peCtx )
+Service::bppCancel( void* pInstance, unsigned int tid )
 {
-    std::auto_ptr<bplus::Object> ptrCtx( bplus::Object::build( peCtx ) );
+    // TODO: implement
+}
 
-    bplus::Map* pmCtx = dynamic_cast<bplus::Map*>( ptrCtx.get() );
-    if (!pmCtx) {
-        return;
-    }
 
-    typedef std::map<std::string, const bplus::Object*> tStrObjMap;
-    tStrObjMap mapCtx = *pmCtx;
-    for (tStrObjMap::const_iterator it = mapCtx.begin(); it != mapCtx.end();
-         ++it)
-    {
-        // Only add string elements.
-        if (it->second->type() == BPTString) {
-            m_mapContext.insert( std::make_pair( it->first, std::string(*it->second)) );
-        }
-    }
+inline int
+Service::bppInstall(const BPPath serviceDir, const BPPath dataDir)
+{
+    return callInstallHook(serviceDir, dataDir);
+}
+
+inline int
+Service::bppUninstall(const BPPath serviceDir, const BPPath dataDir)
+{
+    return callUninstallHook(serviceDir, dataDir);
 }
 
 
@@ -233,7 +299,9 @@ extern "C" \
 } \
 \
 const BPCFunctionTable* bplus::service::Service::s_pCoreFuncs = NULL; \
-const BPElement* bplus::service::Service::s_pParamMap = NULL; \
+tPathString bplus::service::Service::s_serviceDir; \
+tPathString bplus::service::Service::s_dependentDir; \
+bplus::Object* bplus::service::Service::s_pDependentParams = NULL; \
 bplus::service::Description bplus::service::Service::s_description; \
 \
 bplus::service::Service* bplus::service::Service::createInstance() \
@@ -245,14 +313,26 @@ typedef void (className::* tInvokableFunc)( const bplus::service::Transaction& t
                                             const bplus::Map& args ); \
 std::map<std::string, tInvokableFunc> className::s_mapFuncs; \
 \
-inline bool bplus::service::callLoadHandler() \
+inline bool bplus::service::Service::callInitializeHook() \
 { \
-    return className::onServiceLoad(); \
+    return className::onInitialize(); \
 } \
 \
-inline bool bplus::service::callUnloadHandler() \
+inline bool bplus::service::Service::callShutdownHook() \
 { \
-    return className::onServiceUnload(); \
+    return className::onShutdown(); \
+} \
+\
+inline int bplus::service::Service::callInstallHook(const BPPath serviceDir, \
+                                                    const BPPath dataDir) \
+{ \
+   return className::onInstall(serviceDir, dataDir); \
+} \
+\
+inline int bplus::service::Service::callUninstallHook(const BPPath serviceDir, \
+                                                      const BPPath dataDir) \
+{ \
+   return className::onUninstall(serviceDir, dataDir); \
 }
 
 
@@ -308,6 +388,8 @@ void bplus::service::Service::setupDescription() \
 //////////////////////////////
 // BP_SERVICE
 //
+// All the definitions here happen within a class declaration, since
+// that is where the macro is invoked.
 #define BP_SERVICE( className ) \
 typedef void (className::* tInvokableFunc)( const bplus::service::Transaction& tran, \
                                             const bplus::Map& args ); \
