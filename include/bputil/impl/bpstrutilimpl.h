@@ -20,7 +20,7 @@
  * ***** END LICENSE BLOCK *****
  */
 /*
- *  bpstrutil.h
+ *  bpstrutilimpl.h
  *
  *  Inline implementation file for bpstrutil.h
  * 
