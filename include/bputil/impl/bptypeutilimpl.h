@@ -30,7 +30,7 @@
  */
 
 #include <assert.h>
-#include "bpstrutil.h"
+#include "bputil/bpstrutil.h"
 
 
 #ifdef WIN32
@@ -228,12 +228,14 @@ Object::operator std::string() const
     throw ConversionException("cannot convert to string");
 }
 
+#if defined(WIN32) || defined(WINDOWS) || defined(_WINDOWS)
 inline
 //Object::operator file::Path() const 
 Object::operator tPathString() const 
 {
     throw ConversionException("cannot convert to path");
 }
+#endif
 
 inline
 Object::operator long long() const 

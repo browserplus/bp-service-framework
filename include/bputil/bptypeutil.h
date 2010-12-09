@@ -109,10 +109,11 @@ namespace bplus {
         virtual operator bool() const; // throw(ConversionException)
         virtual operator std::string() const; // throw(ConversionException)
         
+#if defined(WIN32) || defined(WINDOWS) || defined(_WINDOWS)
         //virtual operator bp::file::Path() const; // throw(ConversionException)
         virtual operator tPathString() const; // throw(ConversionException)
-        
-		virtual operator long long() const; // throw(ConversionException)
+#endif        
+	virtual operator long long() const; // throw(ConversionException)
         virtual operator double() const; // throw(ConversionException)
         virtual operator std::map<std::string, const Object *>() const;
             // throw(ConversionException)
