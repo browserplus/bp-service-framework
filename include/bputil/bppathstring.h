@@ -31,40 +31,9 @@
 #define BPPATHSTRING_H_
 
 #include <string>
-//#include "bpserviceapi/bptypes.h"
-//#include "bputil/bpstrutil.h"
 
 
 namespace bplus {
-
-/*
-class PathString
-{
-public:
-    explicit PathString( const std::string& sPath ) : m_sPath(sPath) {}
-    
-    explicit PathString( const BPPath path )
-    {
-#if defined(WIN32) || defined(WINDOWS) || defined(_WINDOWS)
-        m_sPath = strutil::wideToUtf8(path);
-#else
-        m_sPath = path;
-#endif
-    }
-
-    const BPPath asBPPath()
-    {
-#if defined(WIN32) || defined(WINDOWS) || defined(_WINDOWS)
-        return const_cast<BPPath>(strutil::utf8ToWide(m_sPath).c_str());
-#else
-        return m_sPath.c_str();
-#endif
-    }
-        
-private:    
-    std::string m_sPath;
-};
-*/
 
 #if defined(WIN32) || defined(WINDOWS) || defined(_WINDOWS)
     typedef std::wstring tPathString;
