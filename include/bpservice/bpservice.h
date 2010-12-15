@@ -83,13 +83,13 @@ public:
 // Note: Do not call these from constructor of classes derived from
 //       this class - use finalConstruct for that purpose.
 public:
-    const std::string&  clientUri();
-    const tPathString&  serviceDir();
-    const tPathString&  dataDir();
-    const tPathString&  tempDir();
-    const std::string&  locale();
-    const std::string&  userAgent();
-    int                 clientPid();
+    const std::string&         clientUri();
+    const bplus::tPathString&  serviceDir();
+    const bplus::tPathString&  dataDir();
+    const bplus::tPathString&  tempDir();
+    const std::string&         locale();
+    const std::string&         userAgent();
+    int                        clientPid();
 
 // Overridable Methods
 protected:
@@ -159,8 +159,8 @@ public:
 // Class-wide State
 protected:
     static const BPCFunctionTable*  s_pCoreFuncs;
-    static tPathString              s_serviceDir;
-    static tPathString              s_dependentDir;
+    static bplus::tPathString       s_serviceDir;
+    static bplus::tPathString       s_dependentDir;
     static bplus::Object*           s_pDependentParams;
     static Description              s_description;
 
@@ -172,13 +172,13 @@ private:
 
 // Instance-specific State    
 private:    
-    std::string     m_clientUri;
-    tPathString     m_serviceDir;
-    tPathString     m_dataDir;
-    tPathString     m_tempDir;
-    std::string     m_locale;
-    std::string     m_userAgent;
-    int             m_clientPid;
+    std::string            m_clientUri;
+    bplus::tPathString     m_serviceDir;
+    bplus::tPathString     m_dataDir;
+    bplus::tPathString     m_tempDir;
+    std::string            m_locale;
+    std::string            m_userAgent;
+    int                    m_clientPid;
     
 // Prevent copying
 private:

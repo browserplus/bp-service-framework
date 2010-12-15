@@ -69,7 +69,7 @@ public:
                                     const bplus::Object& args ) const;
 
     // Prompt the user.
-    unsigned int    promptUser( const tPathString& sPathToHTMLDialog,
+    unsigned int    promptUser( const bplus::tPathString& sPathToHTMLDialog,
                                 const bplus::Object& args,
                                 BPUserResponseCallbackFuncPtr responseCallback,
                                 void* context );
@@ -118,7 +118,7 @@ Transaction::invokeCallback( const bplus::Object& ocb,
 
 
 inline unsigned int
-Transaction::promptUser( const tPathString& sPathToHTMLDialog,
+Transaction::promptUser( const bplus::tPathString& sPathToHTMLDialog,
                          const bplus::Object& args,
                          BPUserResponseCallbackFuncPtr responseCallback,
                          void* context )

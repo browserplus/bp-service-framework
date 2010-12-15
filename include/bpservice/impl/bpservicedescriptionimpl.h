@@ -272,6 +272,13 @@ Function::getArgument(const char * name, Argument &oArg) const
 }
 
 inline void
+Function::addArgument(const Argument& argument)
+{
+    m_arguments.push_back(argument);
+}
+
+
+inline void
 Function::setArguments(
     const std::list<Argument> & arguments) 
 {
@@ -435,6 +442,19 @@ Description::getFunction(const char * funcName,
     return false;
 }
 
+inline bplus::service::Function*
+bplus::service::Description::getFunction(const char * funcName) const
+{
+	std::list<bplus::service::Function>::const_iterator it;
+
+    for (it = m_functions.begin(); it != m_functions.end(); it++) {
+        if (!it->name().compare(funcName)) {
+			return const_cast<bplus::service::Function*>(&(*it));
+        }
+    }
+
+    return NULL;
+}
 
 inline bool
 Description::hasFunction(const char * funcName) const

@@ -56,21 +56,21 @@ Service::clientUri()
     return m_clientUri;
 }
    
-inline const tPathString&
+inline const bplus::tPathString&
 Service::serviceDir()
 {
     return m_serviceDir;
 }
 
 
-inline const tPathString&
+inline const bplus::tPathString&
 Service::dataDir()
 {
     return m_dataDir;
 }
 
 
-inline const tPathString&
+inline const bplus::tPathString&
 Service::tempDir()
 {
     return m_tempDir;
@@ -299,8 +299,8 @@ extern "C" \
 } \
 \
 const BPCFunctionTable* bplus::service::Service::s_pCoreFuncs = NULL; \
-tPathString bplus::service::Service::s_serviceDir; \
-tPathString bplus::service::Service::s_dependentDir; \
+bplus::tPathString bplus::service::Service::s_serviceDir; \
+bplus::tPathString bplus::service::Service::s_dependentDir; \
 bplus::Object* bplus::service::Service::s_pDependentParams = NULL; \
 bplus::service::Description bplus::service::Service::s_description; \
 \

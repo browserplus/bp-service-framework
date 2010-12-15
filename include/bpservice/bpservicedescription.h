@@ -122,7 +122,7 @@ public:
 
     std::list<Argument> arguments() const;
     void setArguments(const std::list<Argument> & arguments);    
-
+    void addArgument(const Argument& argument);
     bool getArgument(const char * name, Argument & oArg) const;
 
     std::string docString() const;
