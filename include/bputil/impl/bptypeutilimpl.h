@@ -41,7 +41,7 @@
 namespace bplus {
 
 
-const char *
+inline const char *
 typeAsString(BPType t)
 {
     switch (t) {
