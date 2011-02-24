@@ -37,6 +37,32 @@
 #pragma warning(disable:4100)
 #endif
 
+inline std::string
+urlEncode(const std::string& s)
+{
+    std::string out;
+
+    char hex[4];
+
+    static const char noencode[] = "!'()*-._";
+    static const char hexvals[] = {
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+        'A', 'B', 'C', 'D', 'E', 'F'
+    };
+
+    for (unsigned int i = 0; i < s.length(); i++) {
+        if (isalnum((unsigned char)s[i]) || strchr(noencode, s[i]) != NULL) {
+            out.append(&s[i], 1);
+        } else {
+            hex[0] = '%';
+            hex[1] = hexvals[(s[i] >> 4) & 0x0F];
+            hex[2] = hexvals[s[i] & 0xF];
+            hex[3] = 0;
+            out.append(hex, strlen(hex));
+        }
+    }
+    return out;
+}
 
 namespace bplus {
 
@@ -413,14 +439,14 @@ WritablePath::clone() const
     return new WritablePath(*this);
 }
 
-/*
+#if 0
 inline 
 Path::Path(const file::Path & path)
     : Object(BPTNativePath), m_path(path.external_file_string())
 {
     e.value.pathVal = (BPPath) m_path.c_str();
 }
-*/
+#endif // 0
 inline 
 Path::Path(const tPathString& path)
    : Object(BPTNativePath), m_path(path)
@@ -450,13 +476,13 @@ Path::operator= (const Path & other)
     return *this;
 }
 
-/*
+#if 0
 inline 
 Path::operator file::Path() const 
 {
 	return file::Path(m_path);
 }
-*/
+#endif // 0
 inline 
 Path::operator tPathString() const 
 {
