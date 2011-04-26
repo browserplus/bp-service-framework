@@ -36,8 +36,7 @@
 namespace bplus {
 
 #if defined(WIN32) || defined(WINDOWS) || defined(_WINDOWS)
-//    typedef std::wstring tPathString;
-    typedef std::string tPathString;
+    typedef std::wstring tPathString;
 #else
     typedef std::string tPathString;
 #endif
